@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -9,74 +8,54 @@
 :root{color-scheme:dark;--bg:#080d1b;--panel:#121d32;--line:#263956;--text:#eef5ff;--muted:#a8bad2;--blue:#3478f6;--gold:#e9ad42}
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(ellipse at top,#17294a,#080d1b 65%);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
-header{padding:26px 16px;text-align:center;border-bottom:1px solid var(--line);background:linear-gradient(110deg,#101d35,#172b4d 55%,#251d3c)}
-header h1{margin:0;font-size:clamp(21px,3vw,30px);letter-spacing:1.5px}
-header p{color:var(--muted);margin:8px 0 0;font-size:13px}
-main{width:min(1320px,96%);margin:22px auto}
-.panel{background:linear-gradient(145deg,rgba(21,35,59,.98),rgba(14,24,42,.98));border:1px solid #304767;border-radius:17px;padding:20px;margin-bottom:17px;box-shadow:0 12px 30px #0004}
-h2{font-size:17px;margin:0 0 17px;display:flex;align-items:center;gap:9px}
+header{padding:22px 16px;text-align:center;border-bottom:1px solid var(--line)}
+header h1{margin:0;font-size:26px;letter-spacing:2px}
+header p{color:var(--muted);margin:8px 0 0}
+main{width:min(1200px,96%);margin:22px auto}
+.panel{background:rgba(18,29,50,.96);border:1px solid var(--line);border-radius:15px;padding:18px;margin-bottom:17px;box-shadow:0 12px 30px #0004}
+h2{font-size:18px;margin:0 0 15px}
 h3{font-size:15px;margin:0 0 10px}
 .hidden{display:none!important}
 button,select,input,textarea{font:inherit}
-button{border:0;border-radius:9px;padding:12px 15px;background:#263b5b;color:white;cursor:pointer;font-weight:bold;transition:transform .15s ease,filter .15s ease,box-shadow .15s ease}
-button:hover{filter:brightness(1.2);transform:translateY(-1px);box-shadow:0 5px 15px #0003}
-button:active{transform:translateY(0)}
+button{border:0;border-radius:9px;padding:12px 15px;background:#263b5b;color:white;cursor:pointer;font-weight:bold}
+button:hover{filter:brightness(1.2)}
 button:disabled{opacity:.5;cursor:not-allowed}
 .primary{background:var(--blue)}
 .snowbtn{background:#267cae}
 .firebtn{background:#b65b23}
 .stopbtn{background:#a52f45}
 .goldbtn{background:#9b7026}
+button.active{outline:2px solid white;outline-offset:2px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .row>*{flex:1}
-label{display:block;color:#c4d3e8;font-size:13px;font-weight:600;margin:12px 0 6px}
+label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}
 input,select,textarea{width:100%;padding:11px;border-radius:8px;background:#091326;color:white;border:1px solid #344967}
 input[type=range]{padding:0}
 textarea{min-height:75px;resize:vertical}
-input:focus,select:focus,textarea:focus{outline:2px solid #5794ff;outline-offset:1px;border-color:#5794ff}
-.preview{background:#050914;border:1px solid #3a5275;border-radius:10px;overflow:hidden;box-shadow:inset 0 0 22px #0005}
-.preview canvas{display:block;width:100%;height:125px}
-.preview-info{background:#0b1528;padding:11px 12px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
-.preview-info b{color:#f1f6ff;font-size:13px}
-.preview-info span{font-weight:bold;letter-spacing:.5px}
-.status{padding:11px;background:#0b162a;border:1px solid #2b4264;border-radius:8px;color:#b8d4ff;margin-top:12px;overflow-wrap:anywhere}
-.small{font-size:12px;color:var(--muted);line-height:1.5;max-width:850px}
+.preview{background:#050914;border:1px solid #344967;border-radius:10px;overflow:hidden}
+.preview canvas{display:block;width:100%;height:110px}
+.preview-info{padding:9px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+.status{padding:11px;background:#091326;border-radius:8px;color:#b8d4ff;margin-top:12px;overflow-wrap:anywhere}
+.small{font-size:12px;color:var(--muted);line-height:1.5}
 #screen{position:fixed;inset:0;background:#080817;overflow:hidden}
 #fireworks{position:absolute;inset:0;width:100%;height:100%}
 .screen-label{position:absolute;top:18px;left:0;right:0;text-align:center;color:#ffffff80;font-size:12px;letter-spacing:3px;pointer-events:none}
 #login{max-width:420px;margin:50px auto}
 #controller{padding-bottom:40px}
-.mode-buttons{grid-template-columns:repeat(3,minmax(0,1fr))}
-.mode-buttons button{min-height:64px;font-size:16px;letter-spacing:.4px}
-.screen-select{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
-.screen-select button{min-height:48px;font-size:12px;padding:9px 5px;border:1px solid #405777;background:#1a2a45}
-.screen-select button.selected{background:linear-gradient(135deg,#3478f6,#5b67e8);border-color:#a8c8ff;box-shadow:0 0 0 2px #3478f655}
-#targetStatus{font-weight:bold}
-
-/* Schermlinks */
-.screen-links-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
-.screen-link-card{background:#0b162a;border:1px solid #304767;border-radius:11px;padding:12px;min-width:0}
-.screen-link-card strong{display:block;margin-bottom:8px;color:#eef5ff}
-.screen-link-value{font-size:12px;overflow-wrap:anywhere;color:#a8c8ff;line-height:1.5;margin-bottom:10px}
-.screen-link-actions{display:flex;gap:8px}
-.screen-link-actions button,.screen-link-actions a{flex:1;text-align:center;text-decoration:none;font-size:12px;padding:10px 8px;border-radius:8px;background:#263b5b;color:white;border:0;font-weight:bold}
-.screen-link-actions a{background:#26704f}
-.screen-link-actions button:hover,.screen-link-actions a:hover{filter:brightness(1.2)}
-
-@media(max-width:850px){
- .screen-select{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
-@media(max-width:600px){
- header h1{font-size:21px}
- .panel{padding:14px}
- main{width:94%}
- .screen-select{grid-template-columns:repeat(2,minmax(0,1fr))}
- .mode-buttons{grid-template-columns:1fr}
- .mode-buttons button{min-height:52px}
- #previewGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .screen-links-grid{grid-template-columns:1fr}
-}
+.mode-buttons button{min-height:54px;font-size:15px}
+.screen-select{display:grid;grid-template-columns:repeat(auto-fit,minmax(75px,1fr));gap:8px}
+.screen-select button{padding:12px 5px}
+.screen-select button.selected{background:#3478f6;outline:2px solid #a8c8ff}
+.style-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.style-card{background:#071124;border:1px solid #344967;border-radius:12px;overflow:hidden;transition:.18s}
+.style-card.selected{border:2px solid var(--gold);box-shadow:0 0 18px #e9ad4250}
+.style-card canvas{display:block;width:100%;height:105px;background:#030711}
+.style-card-body{padding:10px}
+.style-card-body h3{margin:0 0 5px}
+.style-card-body p{font-size:12px;color:var(--muted);min-height:30px;margin:0 0 9px;line-height:1.4}
+.style-card-body button{width:100%;padding:9px}
+@media(max-width:600px){header h1{font-size:21px}.panel{padding:13px}main{width:94%}}
 </style>
 </head>
 <body>
@@ -100,7 +79,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #5794ff;outline-offset
 <main>
 
 <section class="panel">
-<h2>🖥️ Schermoverzicht</h2>
+<h2>🖥️ Live schermoverzicht</h2>
 <div class="grid" id="previewGrid">
 <div class="preview"><canvas id="preview1"></canvas><div class="preview-info"><b>Scherm 1</b><span id="previewStatus1">UIT</span></div></div>
 <div class="preview"><canvas id="preview2"></canvas><div class="preview-info"><b>Scherm 2</b><span id="previewStatus2">UIT</span></div></div>
@@ -108,11 +87,11 @@ input:focus,select:focus,textarea:focus{outline:2px solid #5794ff;outline-offset
 <div class="preview"><canvas id="preview4"></canvas><div class="preview-info"><b>Scherm 4</b><span id="previewStatus4">UIT</span></div></div>
 <div class="preview"><canvas id="preview5"></canvas><div class="preview-info"><b>Scherm 5</b><span id="previewStatus5">UIT</span></div></div>
 </div>
-<p class="small">Voorbeeldweergave van de gekozen modus. Dit is een lokale simulatie, geen live videobeeld van de schermen.</p>
+<p class="small">De previews tonen een lokale simulatie van de gekozen effecten.</p>
 </section>
 
 <section class="panel">
-<h2>🎯 Waar wil je de opdracht uitvoeren?</h2>
+<h2>🎯 Selecteer de schermen</h2>
 <div class="screen-select">
 <button data-target="1" class="selected">SCHERM 1</button>
 <button data-target="2">SCHERM 2</button>
@@ -126,7 +105,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #5794ff;outline-offset
 </section>
 
 <section class="panel">
-<h2>🎛️ Kies de weergave</h2>
+<h2>🎛️ Weergavemodus</h2>
 <div class="grid mode-buttons">
 <button class="snowbtn" id="snowButton">❄ SNEEUW</button>
 <button class="firebtn" id="fireButton">🎆 VUURWERK</button>
@@ -161,6 +140,14 @@ input:focus,select:focus,textarea:focus{outline:2px solid #5794ff;outline-offset
 </section>
 
 <section class="panel">
+<h2>🎇 Kies en bekijk je vuurwerkstijl</h2>
+<p class="small">Elke kaart toont een bewegend voorbeeld. Kies een stijl om deze in te stellen. Met TEST VUURWERK stuur je de gekozen stijl naar de geselecteerde schermen.</p>
+<div class="style-grid" id="styleGrid"></div>
+<button id="testSelectedStyle" class="firebtn" style="width:100%;margin-top:12px">▶ TEST GEKOZEN VUURWERKSTIJL</button>
+<div class="status" id="styleStatus">Kies hierboven een vuurwerkstijl.</div>
+</section>
+
+<section class="panel">
 <h2>❄️ Sneeuwinstellingen</h2>
 <label>Sneeuwintensiteit: <output id="snowOut">55%</output></label>
 <input id="snowIntensity" type="range" min="10" max="100" value="55">
@@ -191,17 +178,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid #5794ff;outline-offset
 <p class="small">Gebruik afbeeldingen tot maximaal 700 KB.</p>
 </section>
 
-<!-- NIEUW: DIRECTE LINKS VOOR ALLE VIJF SCHERMEN -->
 <section class="panel">
-<h2>🔗 Schermlinks</h2>
-<p class="small">Hier vind je de directe links voor alle vijf schermen. Open een scherm op een ander apparaat of kopieer de link om deze te delen.</p>
-<div id="screenLinksGrid" class="screen-links-grid"></div>
-<button id="copyAllScreenLinks" class="primary" style="width:100%;margin-top:13px">📋 KOPIEER ALLE VIJF SCHERMLINKS</button>
-<div id="linksStatus" class="status" aria-live="polite">De schermlinks worden automatisch aangemaakt.</div>
-</section>
-
-<section class="panel">
-<h2>🛠️ Schermbeheer en verversen</h2>
+<h2>🖥️ Schermbeheer</h2>
 <div class="grid">
 <button data-refresh="1">VERVERS SCHERM 1</button>
 <button data-refresh="2">VERVERS SCHERM 2</button>
@@ -300,10 +278,11 @@ async function sendCommand(action,target=selectedTarget,extra={}){
   return;
  }
  const id=crypto.randomUUID();
+ const commandTarget=target==="1+2"?"all":target;
  try{
   await set(ref(db,"show"),{
    action,
-   target,
+   target:commandTarget,
    id,
    updatedAt:Date.now(),
    ...extra
@@ -312,6 +291,20 @@ async function sendCommand(action,target=selectedTarget,extra={}){
  }catch(error){
   setStatus("Firebase-fout: "+error.message);
  }
+}
+
+function updatePreview(screenNumber,mode){
+ const label=document.getElementById("previewStatus"+screenNumber);
+ const canvas=document.getElementById("preview"+screenNumber);
+ if(!label||!canvas)return;
+ label.textContent=mode==="snow"?"SNEEUW":mode==="fireworks"?"VUURWERK":"UIT";
+ canvas.dataset.mode=mode;
+}
+
+function updateAllPreviews(mode,target=selectedTarget){
+ targetScreensFor(target).forEach(n=>{
+  updatePreview(n,mode);
+ });
 }
 
 function targetScreensFor(target){
@@ -354,6 +347,91 @@ document.getElementById("saveFireSettings").addEventListener("click",()=>{
  sendCommand("settings",selectedTarget,{
   fireIntensity,burstSize,shellType
  });
+});
+
+const STYLE_CARDS=[
+ {id:"random",name:"Willekeurig",desc:"Een verrassende mix van verschillende effecten."},
+ {id:"classic",name:"Classic",desc:"Een volle ronde explosie met heldere sterren."},
+ {id:"comet",name:"Comet",desc:"Snelle lichtkogels met lange, gloeiende staarten."},
+ {id:"glitter",name:"Glitter",desc:"Veel kleine fonkelende lichtpuntjes."},
+ {id:"rainbow",name:"Rainbow",desc:"Een kleurrijke explosie in regenboogkleuren."},
+ {id:"ring",name:"Ring",desc:"Een duidelijke cirkel van licht en sterren."},
+ {id:"heart",name:"Heart",desc:"Een explosie in de vorm van een hart."},
+ {id:"star",name:"Star",desc:"Een stervormig patroon in de lucht."},
+ {id:"willow",name:"Golden Willow",desc:"Lange gouden slierten die langzaam neerdalen."}
+];
+const STYLE_PALETTES={
+ random:["#ffd166","#70d6ff","#ff70a6","#80ed99"],
+ classic:["#ffd166","#ffb703","#fff1a8","#ffffff"],
+ comet:["#70d6ff","#b388ff","#ffffff","#f15bb5"],
+ glitter:["#ffffff","#ffd166","#b8e9ff","#f15bb5"],
+ rainbow:["#ff3b30","#ff9500","#ffcc00","#34c759","#00c7be","#007aff","#bf5af2"],
+ ring:["#70d6ff","#ffffff","#b388ff"],
+ heart:["#ff70a6","#ff2d55","#ffd1dc"],
+ star:["#ffd166","#ffffff","#70d6ff"],
+ willow:["#ffd166","#e9ad42","#fff0b3","#d99b30"]
+};
+function drawStyleCard(canvas,style){
+ const c=canvas.getContext("2d"),w=canvas.width,h=canvas.height;
+ let sparks=[],tick=0;
+ function frame(){
+  tick++;c.fillStyle="rgba(3,7,17,.22)";c.fillRect(0,0,w,h);
+  if(tick%68===1){
+   const x=w*(.25+Math.random()*.5),y=h*(.2+Math.random()*.25);
+   const palette=STYLE_PALETTES[style]||STYLE_PALETTES.classic;
+   for(let i=0;i<65;i++){
+    let a=Math.PI*2*i/65+(Math.random()-.5)*.12;
+    let speed=1.1+Math.random()*2.6;
+    if(style==="ring")speed=2.3;
+    if(style==="heart"){
+     const t=a,hx=16*Math.pow(Math.sin(t),3),hy=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+     a=Math.atan2(hy,hx);speed=1.8;
+    }
+    if(style==="star"){
+     a=(Math.floor(i/6.5)/10)*Math.PI*2+(Math.random()-.5)*.08;speed=2.7;
+    }
+    sparks.push({x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,life:1,color:palette[i%palette.length],g:style==="willow"?.045:.018});
+   }
+  }
+  sparks=sparks.filter(p=>{
+   p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.vx*=.99;p.life-=style==="willow"?.009:.018;
+   c.globalAlpha=Math.max(0,p.life);c.fillStyle=p.color;c.shadowBlur=7;c.shadowColor=p.color;
+   c.beginPath();c.arc(p.x,p.y,1.7,0,Math.PI*2);c.fill();return p.life>0;
+  });
+  c.globalAlpha=1;c.shadowBlur=0;requestAnimationFrame(frame);
+ }
+ frame();
+}
+function renderStyleCards(){
+ const grid=document.getElementById("styleGrid");if(!grid)return;
+ STYLE_CARDS.forEach(style=>{
+  const card=document.createElement("div");card.className="style-card";card.dataset.style=style.id;
+  const preview=document.createElement("canvas");preview.width=340;preview.height=150;
+  const body=document.createElement("div");body.className="style-card-body";
+  const title=document.createElement("h3");title.textContent=style.name;
+  const desc=document.createElement("p");desc.textContent=style.desc;
+  const choose=document.createElement("button");choose.type="button";choose.textContent="KIES DEZE STIJL";
+  choose.addEventListener("click",()=>{
+   shellType=style.id;document.getElementById("shellType").value=style.id;
+   document.querySelectorAll(".style-card").forEach(x=>x.classList.toggle("selected",x===card));
+   document.getElementById("styleStatus").textContent=style.name+" geselecteerd. Klik op TEST om deze stijl op de schermen te bekijken.";
+  });
+  body.append(title,desc,choose);card.append(preview,body);grid.appendChild(card);drawStyleCard(preview,style.id);
+ });
+ const initial=grid.querySelector('[data-style="random"]');if(initial)initial.classList.add("selected");
+}
+renderStyleCards();
+document.getElementById("testSelectedStyle").addEventListener("click",async()=>{
+ shellType=document.getElementById("shellType").value;
+ burstSize=document.getElementById("burstSize").value;
+ try{
+  await sendCommand("settings",selectedTarget,{fireIntensity,burstSize,shellType});
+  await sendCommand("display-mode",selectedTarget,{displayMode:"fireworks"});
+  document.getElementById("styleStatus").textContent="Test gestart: "+(STYLE_CARDS.find(s=>s.id===shellType)?.name||shellType)+" op "+selectedTarget+".";
+ }catch(e){document.getElementById("styleStatus").textContent="Test mislukt: "+e.message;}
+});
+document.getElementById("shellType").addEventListener("change",e=>{
+ document.querySelectorAll(".style-card").forEach(card=>card.classList.toggle("selected",card.dataset.style===e.target.value));
 });
 
 document.getElementById("saveSnowSettings").addEventListener("click",async()=>{
@@ -409,96 +487,6 @@ document.getElementById("refreshAll").addEventListener("click",()=>{
   sendCommand("refresh","all");
  }
 });
-
-/* ==========================================
-   SCHERMLINKS
-   Automatisch opgebouwd vanaf het huidige domein.
-   ========================================== */
-
-const screenBaseUrl=location.origin+location.pathname;
-
-const screenUrls=Array.from({length:5},(_,index)=>({
- number:index+1,
- url:screenBaseUrl+"?browser="+(index+1)
-}));
-
-async function copyText(text){
- try{
-  if(navigator.clipboard&&window.isSecureContext){
-   await navigator.clipboard.writeText(text);
-  }else{
-   const field=document.createElement("textarea");
-   field.value=text;
-   field.style.position="fixed";
-   field.style.opacity="0";
-   document.body.appendChild(field);
-   field.select();
-   const copied=document.execCommand("copy");
-   field.remove();
-   if(!copied)throw new Error("Kopiëren wordt door deze browser niet ondersteund.");
-  }
-  return true;
- }catch(error){
-  const status=document.getElementById("linksStatus");
-  if(status)status.textContent="Kopiëren mislukt: "+error.message;
-  return false;
- }
-}
-
-function buildScreenLinks(){
- const grid=document.getElementById("screenLinksGrid");
- if(!grid)return;
-
- grid.replaceChildren();
-
- for(const item of screenUrls){
-  const card=document.createElement("div");
-  card.className="screen-link-card";
-
-  const title=document.createElement("strong");
-  title.textContent="🖥️ Scherm "+item.number;
-
-  const url=document.createElement("div");
-  url.className="screen-link-value";
-  url.textContent=item.url;
-
-  const actions=document.createElement("div");
-  actions.className="screen-link-actions";
-
-  const copyButton=document.createElement("button");
-  copyButton.type="button";
-  copyButton.textContent="📋 Kopieer link";
-  copyButton.addEventListener("click",async()=>{
-   const copied=await copyText(item.url);
-   if(copied){
-    document.getElementById("linksStatus").textContent="Link van scherm "+item.number+" gekopieerd.";
-   }
-  });
-
-  const openLink=document.createElement("a");
-  openLink.href=item.url;
-  openLink.target="_blank";
-  openLink.rel="noopener noreferrer";
-  openLink.textContent="↗ Open scherm";
-
-  actions.append(copyButton,openLink);
-  card.append(title,url,actions);
-  grid.appendChild(card);
- }
-}
-
-document.getElementById("copyAllScreenLinks").addEventListener("click",async()=>{
- const allLinks=screenUrls.map(item=>"Scherm "+item.number+": "+item.url).join("\n");
- const copied=await copyText(allLinks);
-
- if(copied){
-  document.getElementById("linksStatus").textContent="Alle vijf schermlinks zijn gekopieerd.";
- }
-});
-
-buildScreenLinks();
-
-/* EINDE SCHERMLINKS */
 
 document.getElementById("logoutButton").addEventListener("click",async()=>{
  await signOut(auth);
@@ -607,13 +595,13 @@ function drawSnow(){
 function burst(x,y,palette,type){
  const scale=burstSize==="mega"?2.2:burstSize==="large"?1.5:1;
  const count=Math.round((80+Math.random()*65)*scale*(fireIntensity/65));
-
  for(let i=0;i<count;i++){
   let a=Math.random()*Math.PI*2;
   let speed=(1.2+Math.random()*5.5)*scale;
-
   if(type==="ring")speed=3.5*scale;
-
+  if(type==="willow")speed=(1.4+Math.random()*3.2)*scale;
+  if(type==="comet")speed=(3.2+Math.random()*4.2)*scale;
+  if(type==="glitter")speed=(1.8+Math.random()*6.2)*scale;
   if(type==="heart"){
    const t=a;
    const hx=16*Math.pow(Math.sin(t),3);
@@ -621,12 +609,12 @@ function burst(x,y,palette,type){
    a=Math.atan2(hy,hx);
    speed=3*scale;
   }
-
   particles.push({
    x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,
-   life:1,decay:.008+Math.random()*.012,
+   life:1,decay:type==="willow"?.004+Math.random()*.007:type==="glitter"?.015+Math.random()*.018:.008+Math.random()*.012,
    color:palette[Math.floor(Math.random()*palette.length)],
-   size:1+Math.random()*2.5,gravity:.04
+   size:type==="glitter"?.7+Math.random()*2.2:1+Math.random()*2.5,
+   gravity:type==="willow"?.075:.04
   });
  }
 }
@@ -635,10 +623,8 @@ function launch(){
  const palette=shellType==="rainbow"
  ?["#ff3b30","#ff9500","#ffcc00","#34c759","#00c7be","#007aff","#bf5af2"]
  :colors[browser-1];
-
  const types=["classic","ring","heart","star","willow","glitter","comet"];
  const type=shellType==="random"?types[Math.floor(Math.random()*types.length)]:shellType;
-
  rockets.push({
   x:W*(.12+Math.random()*.76),y:H+5,
   target:H*(.13+Math.random()*.55),
@@ -658,7 +644,6 @@ function startProjection(data){
   const off=document.createElement("canvas");
   off.width=220;off.height=130;
   const o=off.getContext("2d");
-
   if(data.image){
    o.drawImage(img,0,0,220,130);
   }else{
@@ -668,12 +653,10 @@ function startProjection(data){
    o.textBaseline="middle";
    o.fillText(data.text||"",110,65,210);
   }
-
   const pixels=o.getImageData(0,0,220,130).data;
   const scale=Math.min(W*.82/220,H*.65/130);
   const ox=(W-220*scale)/2,oy=(H-130*scale)/2;
   projectionParticles=[];
-
   for(let y=0;y<130;y+=2){
    for(let x=0;x<220;x+=2){
     const k=(y*220+x)*4;
@@ -685,24 +668,18 @@ function startProjection(data){
     }
    }
   }
-
   const start=Date.now(),duration=Number(data.duration)||4000;
-
   function reveal(){
    if(!projectionRunning)return;
-
    const progress=Math.min(1,(Date.now()-start)/duration);
    ctx.fillStyle="rgba(8,8,23,.25)";
    ctx.fillRect(0,0,W,H);
-
    for(const p of projectionParticles){
     ctx.globalAlpha=.25+.75*progress;
     ctx.fillStyle=p.color;
     ctx.fillRect(p.x,p.y,3,3);
    }
-
    ctx.globalAlpha=1;
-
    if(progress<1)requestAnimationFrame(reveal);
    else if(data.mode==="project")projectionRunning=false;
    else{
@@ -719,73 +696,51 @@ function startProjection(data){
     fireworksRunning=true;
    }
   }
-
   reveal();
  };
-
  if(data.image){
   img.onload=render;
-  img.onerror=()=>{
-   projectionRunning=false;
-   console.error("Projectieafbeelding kon niet worden geladen");
-  };
+  img.onerror=()=>{projectionRunning=false;console.error("Projectieafbeelding kon niet worden geladen");};
   img.src=data.image;
  }else render();
 }
 
 function animate(){
  requestAnimationFrame(animate);
-
  if(!fireworksRunning&&!snowRunning&&!projectionRunning)return;
-
  if(!projectionRunning){
   ctx.fillStyle="rgba(8,8,23,.19)";
   ctx.fillRect(0,0,W,H);
  }
-
  if(snowRunning)drawSnow();
-
  if(fireworksRunning){
   if(Math.random()<.012+(fireIntensity/100)*.075)launch();
-
   rockets=rockets.filter(r=>{
    r.y-=r.speed;
    ctx.beginPath();
    ctx.arc(r.x,r.y,2.5,0,Math.PI*2);
    ctx.fillStyle=r.color;
    ctx.fill();
-
-   if(r.y<=r.target){
-    burst(r.x,r.y,r.palette,r.type);
-    return false;
-   }
+   if(r.y<=r.target){burst(r.x,r.y,r.palette,r.type);return false;}
    return true;
   });
-
   particles=particles.filter(p=>{
    p.x+=p.vx;
    p.y+=p.vy;
    p.vy+=p.gravity;
    p.vx*=.985;
    p.life-=p.decay;
-
    ctx.globalAlpha=Math.max(0,p.life);
    ctx.beginPath();
    ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
    ctx.fillStyle=p.color;
    ctx.fill();
-
    return p.life>0;
   });
-
   ctx.globalAlpha=1;
  }
 }
-
-if(!animationStarted){
- animationStarted=true;
- animate();
-}
+if(!animationStarted){animationStarted=true;animate();}
 
 function applyCommand(data){
  if(!data||!data.action)return;
@@ -793,69 +748,45 @@ function applyCommand(data){
  if(data.id)lastCommand=data.id;
 
  if(data.action==="refresh"){
-  if(data.target==="all"||Number(data.target)===browser||(data.target==="1+2"&&browser<=2)){
+  if(data.target==="all"||Number(data.target)===browser){
    if(Date.now()-Number(data.updatedAt)<30000)location.reload();
   }
   return;
  }
-
- if(data.target!=="all"&&Number(data.target)!==browser&&!(data.target==="1+2"&&browser<=2))return;
+ if(data.target!=="all"&&Number(data.target)!==browser)return;
 
  if(data.action==="display-mode"){
   clearEffects();
   const mode=data.displayMode||"off";
-
   if(mode==="snow"&&browser<=2){
-   snowRunning=true;
-   createSnow();
+   snowRunning=true;createSnow();
   }else if(mode==="fireworks"){
    fireworksRunning=true;
   }
   return;
  }
-
  if(data.action==="start"||data.action==="resume"){
-  clearEffects();
-  fireworksRunning=true;
-  return;
+  clearEffects();fireworksRunning=true;return;
  }
-
- if(data.action==="stop"){
-  clearEffects();
-  return;
- }
-
- if(data.action==="pause"){
-  fireworksRunning=false;
-  return;
- }
-
+ if(data.action==="stop"){clearEffects();return;}
+ if(data.action==="pause"){fireworksRunning=false;return;}
  if(data.action==="settings"){
   fireIntensity=Number(data.fireIntensity)||65;
   burstSize=data.burstSize||"large";
   shellType=data.shellType||"random";
   return;
  }
-
  if(data.action==="snow-on"&&browser<=2){
-  clearEffects();
-  snowRunning=true;
-  createSnow();
-  return;
+  clearEffects();snowRunning=true;createSnow();return;
  }
-
  if(data.action==="snow-off"&&browser<=2){
-  clearEffects();
-  return;
+  clearEffects();return;
  }
-
  if(data.action==="projection"&&browser<=2){
   if(data.id===lastProjection)return;
   lastProjection=data.id;
-  startProjection(data);
-  return;
+  startProjection(data);return;
  }
-
  if(data.action==="clear-projection"&&browser<=2){
   clearEffects();
  }
@@ -863,25 +794,18 @@ function applyCommand(data){
 
 if(!controller){
  let connected=false;
-
  onAuthStateChanged(auth,async user=>{
   if(!user){
-   try{
-    await signInAnonymously(auth);
-   }catch(e){
-    console.error(e);
-   }
+   try{await signInAnonymously(auth);}
+   catch(e){console.error(e);}
    return;
   }
-
   if(user.isAnonymous&&!connected){
    connected=true;
-
    onValue(ref(db,"show"),snapshot=>{
     const data=snapshot.val();
     if(data)applyCommand(data);
    },error=>console.error("Firebase show:",error));
-
    onValue(ref(db,"settings/snowIntensity"),snapshot=>{
     const value=Number(snapshot.val());
     if(value>=10&&value<=100){
@@ -895,15 +819,12 @@ if(!controller){
 
 if(controller){
  let showListener=false;
-
  onAuthStateChanged(auth,user=>{
   if(user&&user.uid===ADMIN_UID&&!showListener){
    showListener=true;
-
    onValue(ref(db,"show"),snapshot=>{
     const data=snapshot.val();
     if(!data)return;
-
     if(data.action==="display-mode"){
      updateAllPreviews(data.displayMode||"off",data.target);
     }else if(data.action==="stop"){
@@ -920,96 +841,54 @@ if(controller){
  });
 }
 
-const previewLoops=new Map();
-
 function startPreview(canvas,mode){
- const old=previewLoops.get(canvas);
- if(old)old.active=false;
-
- const loop={active:true};
- previewLoops.set(canvas,loop);
-
  const c=canvas.getContext("2d");
- const w=canvas.width=Math.max(1,canvas.clientWidth*2);
- const h=canvas.height=Math.max(1,canvas.clientHeight*2);
-
- const dots=Array.from({length:38},()=>({
-  x:Math.random()*w,
-  y:Math.random()*h,
-  v:.7+Math.random()*1.8,
-  r:1+Math.random()*2
- }));
-
+ const w=canvas.width=canvas.clientWidth*2;
+ const h=canvas.height=canvas.clientHeight*2;
+ let dots=[];
+ for(let i=0;i<30;i++)dots.push({x:Math.random()*w,y:Math.random()*h,v:1+Math.random()*2});
  function draw(){
-  if(!loop.active||canvas.dataset.mode!==mode)return;
-
   c.fillStyle="#050914";
   c.fillRect(0,0,w,h);
-
   if(mode==="snow"){
    c.fillStyle="#e5f5ff";
-
    for(const p of dots){
     p.y+=p.v;
-    if(p.y>h){
-     p.y=-4;
-     p.x=Math.random()*w;
-    }
-    p.x+=Math.sin(p.y*.008)*.25;
-    c.beginPath();
-    c.arc(p.x,p.y,p.r,0,Math.PI*2);
-    c.fill();
+    if(p.y>h)p.y=0;
+    c.beginPath();c.arc(p.x,p.y,2,0,Math.PI*2);c.fill();
    }
   }else if(mode==="fireworks"){
-   for(let i=0;i<15;i++){
-    const x=(i*137+Math.sin(Date.now()*.001+i)*35)%w;
-    const y=(i*71+Math.cos(Date.now()*.0013+i)*25)%(h*.85);
-
-    c.fillStyle=colors[Number(canvas.dataset.screen)-1][i%4];
-    c.globalAlpha=.45+Math.random()*.5;
-    c.beginPath();
-    c.arc(x,y,1+Math.random()*2.5,0,Math.PI*2);
-    c.fill();
+   for(let i=0;i<12;i++){
+    const x=Math.random()*w,y=Math.random()*h;
+    c.fillStyle=colors[canvas.dataset.screen-1][i%4];
+    c.globalAlpha=.8;
+    c.beginPath();c.arc(x,y,1+Math.random()*3,0,Math.PI*2);c.fill();
    }
    c.globalAlpha=1;
   }
-
-  requestAnimationFrame(draw);
+  if(canvas.dataset.mode===mode)requestAnimationFrame(draw);
  }
-
  draw();
-}
-
-function updatePreview(number,mode){
- const label=document.getElementById("previewStatus"+number);
- const canvas=document.getElementById("preview"+number);
-
- if(!label||!canvas)return;
-
- label.textContent=mode==="snow"?"SNEEUW":mode==="fireworks"?"VUURWERK":"UIT";
- canvas.dataset.mode=mode;
-
- if(mode!=="off"){
-  startPreview(canvas,mode);
- }else{
-  const loop=previewLoops.get(canvas);
-  if(loop)loop.active=false;
-
-  const c=canvas.getContext("2d");
-  c.clearRect(0,0,canvas.width,canvas.height);
- }
-}
-
-function updateAllPreviews(mode,target=selectedTarget){
- targetScreensFor(target).forEach(n=>updatePreview(n,mode));
 }
 
 for(let n=1;n<=5;n++){
  const c=document.getElementById("preview"+n);
  c.dataset.screen=n;
  c.dataset.mode="off";
+ const original=updatePreview;
+ updatePreview=function(number,mode){
+  original(number,mode);
+  const target=document.getElementById("preview"+number);
+  if(target){
+   target.dataset.mode=mode;
+   if(mode!=="off")startPreview(target,mode);
+   else{
+    const x=target.getContext("2d");
+    x.clearRect(0,0,target.width,target.height);
+   }
+  }
+ };
 }
-
 </script>
 </body>
 </html>
