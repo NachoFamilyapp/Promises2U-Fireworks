@@ -1,34 +1,199 @@
-```html
-    <p class="note">Laat eerst een afbeelding of tekst verschijnen. Daarna wordt deze omgezet in lichtdeeltjes en een vuurwerkexplosie.</p>
-    <label for="projectionText">Tekstprojectie</label>
-    <textarea id="projectionText" maxlength="90" placeholder="Bijvoorbeeld: HAPPY BIRTHDAY!"></textarea>
-    <label for="projectionImage">Of kies een afbeelding (PNG, JPG, WEBP)</label>
-    <input id="projectionImage" type="file" accept="image/png,image/jpeg,image/webp">
-    <div class="row">
-      <div><label for="projectionDuration">Projectieduur</label><select id="projectionDuration"><option value="2500">2,5 seconden</option><option value="4000" selected>4 seconden</option><option value="6000">6 seconden</option></select></div>
-      <div><label for="projectionMode">Verschijning</label><select id="projectionMode"><option value="both" selected>Projectie + explosie</option><option value="project">Alleen projectie</option><option value="particles">Direct deeltjes</option></select></div>
-    </div>
-    <button class="projection" id="sendProjection" style="width:100%;margin-top:10px">✨ PROJECTIE VERZENDEN</button>
-    <p class="small">Afbeeldingen worden tijdelijk in Firebase Realtime Database meegestuurd als gecomprimeerde afbeelding. Gebruik bij voorkeur kleine afbeeldingen (maximaal 700 KB).</p>
-    <button id="clearProjection" style="width:100%;margin-top:7px">PROJECTIE WISSEN</button>
-  </div>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Promises2U Fireworks</title>
+<style>
+:root{color-scheme:dark;--bg:#080d1b;--panel:#121d32;--line:#263956;--text:#eef5ff;--muted:#a8bad2;--blue:#3478f6;--gold:#e9ad42}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#17294a,#080d1b 65%);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
+header{padding:22px 16px;text-align:center;border-bottom:1px solid var(--line)}
+header h1{margin:0;font-size:26px;letter-spacing:2px}
+header p{color:var(--muted);margin:8px 0 0}
+main{width:min(1200px,96%);margin:22px auto}
+.panel{background:rgba(18,29,50,.96);border:1px solid var(--line);border-radius:15px;padding:18px;margin-bottom:17px;box-shadow:0 12px 30px #0004}
+h2{font-size:18px;margin:0 0 15px}
+h3{font-size:15px;margin:0 0 10px}
+.hidden{display:none!important}
+button,select,input,textarea{font:inherit}
+button{border:0;border-radius:9px;padding:12px 15px;background:#263b5b;color:white;cursor:pointer;font-weight:bold}
+button:hover{filter:brightness(1.2)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.primary{background:var(--blue)}
+.snowbtn{background:#267cae}
+.firebtn{background:#b65b23}
+.stopbtn{background:#a52f45}
+.goldbtn{background:#9b7026}
+button.active{outline:2px solid white;outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1}
+label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}
+input,select,textarea{width:100%;padding:11px;border-radius:8px;background:#091326;color:white;border:1px solid #344967}
+input[type=range]{padding:0}
+textarea{min-height:75px;resize:vertical}
+.preview{background:#050914;border:1px solid #344967;border-radius:10px;overflow:hidden}
+.preview canvas{display:block;width:100%;height:110px}
+.preview-info{padding:9px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+.status{padding:11px;background:#091326;border-radius:8px;color:#b8d4ff;margin-top:12px;overflow-wrap:anywhere}
+.small{font-size:12px;color:var(--muted);line-height:1.5}
+#screen{position:fixed;inset:0;background:#080817;overflow:hidden}
+#fireworks{position:absolute;inset:0;width:100%;height:100%}
+.screen-label{position:absolute;top:18px;left:0;right:0;text-align:center;color:#ffffff80;font-size:12px;letter-spacing:3px;pointer-events:none}
+#login{max-width:420px;margin:50px auto}
+#controller{padding-bottom:40px}
+.mode-buttons button{min-height:54px;font-size:15px}
+.screen-select{display:grid;grid-template-columns:repeat(auto-fit,minmax(75px,1fr));gap:8px}
+.screen-select button{padding:12px 5px}
+.screen-select button.selected{background:#3478f6;outline:2px solid #a8c8ff}
+@media(max-width:600px){header h1{font-size:21px}.panel{padding:13px}main{width:94%}}
+</style>
+</head>
+<body>
 
-  <div class="section">
-    <h2 class="section-title">🖥️ Schermbeheer</h2>
-    <div class="controls">
-      <button data-refresh="1">VERVERS SCHERM 1</button><button data-refresh="2">VERVERS SCHERM 2</button>
-    </div>
-    <button id="refreshAll" class="stop" style="width:100%;margin-top:9px">ALLE VIJF SCHERMEN VERVERSEN</button>
-  </div>
-  <p class="note" id="status">Controller gereed.</p>
-  <button id="logoutButton" style="width:100%">UITLOGGEN</button>
+<header>
+<h1>✨ PROMISES2U FIREWORKS ✨</h1>
+<p>Central Fireworks Control System</p>
+</header>
+
+<div id="login" class="panel hidden">
+<h2>🔐 Beheerderslogin</h2>
+<label>E-mailadres</label>
+<input id="email" type="email" autocomplete="username">
+<label>Wachtwoord</label>
+<input id="password" type="password" autocomplete="current-password">
+<button id="loginButton" class="primary" style="width:100%;margin-top:15px">INLOGGEN</button>
+<div id="loginStatus" class="status">Log in om de controller te openen.</div>
 </div>
+
+<div id="controller" class="hidden">
+<main>
+
+<section class="panel">
+<h2>🖥️ Live schermoverzicht</h2>
+<div class="grid" id="previewGrid">
+<div class="preview"><canvas id="preview1"></canvas><div class="preview-info"><b>Scherm 1</b><span id="previewStatus1">UIT</span></div></div>
+<div class="preview"><canvas id="preview2"></canvas><div class="preview-info"><b>Scherm 2</b><span id="previewStatus2">UIT</span></div></div>
+<div class="preview"><canvas id="preview3"></canvas><div class="preview-info"><b>Scherm 3</b><span id="previewStatus3">UIT</span></div></div>
+<div class="preview"><canvas id="preview4"></canvas><div class="preview-info"><b>Scherm 4</b><span id="previewStatus4">UIT</span></div></div>
+<div class="preview"><canvas id="preview5"></canvas><div class="preview-info"><b>Scherm 5</b><span id="previewStatus5">UIT</span></div></div>
+</div>
+<p class="small">De previews tonen een lokale simulatie van de gekozen effecten.</p>
+</section>
+
+<section class="panel">
+<h2>🎯 Selecteer de schermen</h2>
+<div class="screen-select">
+<button data-target="1" class="selected">SCHERM 1</button>
+<button data-target="2">SCHERM 2</button>
+<button data-target="3">SCHERM 3</button>
+<button data-target="4">SCHERM 4</button>
+<button data-target="5">SCHERM 5</button>
+<button data-target="1+2">1 + 2</button>
+<button data-target="all">ALLE 5</button>
+</div>
+<div class="status" id="targetStatus">Geselecteerd: Scherm 1</div>
+</section>
+
+<section class="panel">
+<h2>🎛️ Weergavemodus</h2>
+<div class="grid mode-buttons">
+<button class="snowbtn" id="snowButton">❄ SNEEUW</button>
+<button class="firebtn" id="fireButton">🎆 VUURWERK</button>
+<button class="stopbtn" id="stopButton">■ STOP</button>
+</div>
+<p class="small">Een nieuwe modus stopt eerst de vorige modus op de geselecteerde schermen.</p>
+</section>
+
+<section class="panel">
+<h2>🎆 Vuurwerkinstellingen</h2>
+<label>Vuurwerkintensiteit: <output id="fireOut">65%</output></label>
+<input id="fireIntensity" type="range" min="10" max="100" value="65">
+<label>Explosiegrootte</label>
+<select id="burstSize">
+<option value="normal">Normaal</option>
+<option value="large" selected>Groot</option>
+<option value="mega">Mega</option>
+</select>
+<label>Vuurwerkstijl</label>
+<select id="shellType">
+<option value="random">Willekeurig</option>
+<option value="classic">Classic</option>
+<option value="comet">Comet</option>
+<option value="glitter">Glitter</option>
+<option value="rainbow">Rainbow</option>
+<option value="ring">Ring</option>
+<option value="heart">Heart</option>
+<option value="star">Star</option>
+<option value="willow">Golden Willow</option>
+</select>
+<button id="saveFireSettings" class="goldbtn" style="width:100%;margin-top:13px">INSTELLINGEN TOEPASSEN</button>
+</section>
+
+<section class="panel">
+<h2>❄️ Sneeuwinstellingen</h2>
+<label>Sneeuwintensiteit: <output id="snowOut">55%</output></label>
+<input id="snowIntensity" type="range" min="10" max="100" value="55">
+<button id="saveSnowSettings" class="snowbtn" style="width:100%;margin-top:13px">SNEEUWINTENSITEIT TOEPASSEN</button>
+</section>
+
+<section class="panel">
+<h2>✨ Sky Projection</h2>
+<p class="small">Toon tekst of een afbeelding en laat deze veranderen in lichtdeeltjes.</p>
+<label>Tekstprojectie</label>
+<textarea id="projectionText" maxlength="90" placeholder="Bijvoorbeeld: HAPPY BIRTHDAY!"></textarea>
+<label>Afbeelding</label>
+<input id="projectionImage" type="file" accept="image/png,image/jpeg,image/webp">
+<label>Projectieduur</label>
+<select id="projectionDuration">
+<option value="2500">2,5 seconden</option>
+<option value="4000" selected>4 seconden</option>
+<option value="6000">6 seconden</option>
+</select>
+<label>Verschijning</label>
+<select id="projectionMode">
+<option value="both">Projectie + explosie</option>
+<option value="project">Alleen projectie</option>
+<option value="particles">Direct deeltjes</option>
+</select>
+<button id="sendProjection" class="goldbtn" style="width:100%;margin-top:12px">✨ PROJECTIE VERZENDEN</button>
+<button id="clearProjection" style="width:100%;margin-top:8px">PROJECTIE WISSEN</button>
+<p class="small">Gebruik afbeeldingen tot maximaal 700 KB.</p>
+</section>
+
+<section class="panel">
+<h2>🖥️ Schermbeheer</h2>
+<div class="grid">
+<button data-refresh="1">VERVERS SCHERM 1</button>
+<button data-refresh="2">VERVERS SCHERM 2</button>
+<button data-refresh="3">VERVERS SCHERM 3</button>
+<button data-refresh="4">VERVERS SCHERM 4</button>
+<button data-refresh="5">VERVERS SCHERM 5</button>
+</div>
+<button id="refreshAll" class="stopbtn" style="width:100%;margin-top:12px">ALLE VIJF SCHERMEN VERVERSEN</button>
+</section>
+
+<div class="status" id="status">Controller gereed.</div>
+<button id="logoutButton" style="width:100%;margin-top:12px">UITLOGGEN</button>
+
+</main>
+</div>
+
+<div id="screen" class="hidden">
+<canvas id="fireworks"></canvas>
+<div class="screen-label" id="number"></div>
 </div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,signInWithEmailAndPassword,signInAnonymously,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getDatabase,ref,set,onValue} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+import {
+ getAuth,signInWithEmailAndPassword,signInAnonymously,
+ onAuthStateChanged,signOut
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {
+ getDatabase,ref,set,onValue
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
 const firebaseConfig={
  apiKey:"AIzaSyCeSW4dzzMZStmrI9FngSKC6HXNi51Doh0",
@@ -39,206 +204,271 @@ const firebaseConfig={
  messagingSenderId:"270417648985",
  appId:"1:270417648985:web:9ae68d53bbb78ca102c048"
 };
+
 const ADMIN_UID="9FoU4AHM14W5VsIMJQviVRzIZD92";
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app);
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getDatabase(app);
 const params=new URLSearchParams(location.search);
 const controller=params.has("controller");
 const browser=Math.min(5,Math.max(1,Number(params.get("browser"))||1));
-const canvas=document.getElementById("fireworks"),ctx=canvas.getContext("2d");
-const palette=[["#ffd166","#ffb703","#fff1a8","#fff"],["#70d6ff","#b388ff","#f15bb5","#fff"],["#ff595e","#ffca3a","#fff","#ff924c"],["#80ed99","#57cc99","#caffbf","#fff"],["#ff70a6","#ffd670","#70d6ff","#fff"]];
-document.getElementById("number").textContent="BROWSER "+browser;
-if(controller){document.getElementById("controller").classList.remove("hidden");document.getElementById("screen").classList.add("hidden");}
 
-let W=0,H=0,rockets=[],particles=[],snowflakes=[],projectionParticles=[];
-let fireworksRunning=true,snowRunning=false,projectionRunning=false;
-let fireIntensity=65,snowIntensity=55,burstSize="large",shellType="random";
-let lastProjectionId="",lastRefreshId="";
-function resize(){const d=window.devicePixelRatio||1;canvas.width=innerWidth*d;canvas.height=innerHeight*d;ctx.setTransform(d,0,0,d,0,0);W=innerWidth;H=innerHeight;if(snowRunning)createSnow();}
-addEventListener("resize",resize);resize();
+const login=document.getElementById("login");
+const control=document.getElementById("controller");
+const screen=document.getElementById("screen");
 
-function clearFireworks(){fireworksRunning=false;rockets=[];particles=[];}
-function clearAll(){clearFireworks();snowRunning=false;projectionRunning=false;projectionParticles=[];ctx.clearRect(0,0,W,H);}
-function burst(x,y,colors,type="classic"){
- const scale=burstSize==="mega"?2.35:burstSize==="large"?1.55:1;
- const amount=Math.round((type==="glitter"?150:type==="willow"?110:82+Math.random()*65)*scale*(fireIntensity/65));
- for(let i=0;i<amount;i++){
-  let a=Math.random()*Math.PI*2,sp=(1.2+Math.random()*5.5)*scale;
-  if(type==="ring")sp=(3.2+Math.random()*.7)*scale;
-  if(type==="heart"){const t=a;const hx=16*Math.pow(Math.sin(t),3),hy=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));a=Math.atan2(hy,hx);sp=(2.5+Math.random()*1.2)*scale;}
-  if(type==="star"){const points=5,sector=Math.floor(Math.random()*points),base=sector*2*Math.PI/points;a=base+(Math.random()-.5)*.45;sp=(sector%2?2.2:5)*scale;}
-  if(type==="willow")sp=(1.2+Math.random()*3.2)*scale;
-  particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:(type==="willow"?.004:.007)+Math.random()*.012,color:colors[Math.floor(Math.random()*colors.length)],size:(1+Math.random()*2.5)*Math.min(2,scale),gravity:type==="willow"?.025:.045});
+let selectedTarget="1";
+let currentMode="off";
+let fireIntensity=65;
+let snowIntensity=55;
+let burstSize="large";
+let shellType="random";
+let lastCommand="";
+let lastProjection="";
+
+if(controller){
+ control.classList.remove("hidden");
+ screen.classList.add("hidden");
+}else{
+ screen.classList.remove("hidden");
+ control.classList.add("hidden");
+ login.classList.add("hidden");
+ document.getElementById("number").textContent="PROMISES2U FIREWORKS · SCHERM "+browser;
+}
+
+function setStatus(message){
+ const el=document.getElementById("status");
+ if(el)el.textContent=message;
+}
+
+function targetScreens(){
+ if(selectedTarget==="all")return [1,2,3,4,5];
+ if(selectedTarget==="1+2")return [1,2];
+ return [Number(selectedTarget)];
+}
+
+document.querySelectorAll("[data-target]").forEach(button=>{
+ button.addEventListener("click",()=>{
+  selectedTarget=button.dataset.target;
+  document.querySelectorAll("[data-target]").forEach(b=>b.classList.remove("selected"));
+  button.classList.add("selected");
+  document.getElementById("targetStatus").textContent="Geselecteerd: "+(selectedTarget==="all"?"Alle vijf schermen":selectedTarget==="1+2"?"Scherm 1 en 2":"Scherm "+selectedTarget);
+ });
+});
+
+async function sendCommand(action,target=selectedTarget,extra={}){
+ if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID){
+  setStatus("Geen beheerrechten. Log opnieuw in.");
+  return;
+ }
+ const id=crypto.randomUUID();
+ const commandTarget=target==="1+2"?"all":target;
+ try{
+  await set(ref(db,"show"),{
+   action,
+   target:commandTarget,
+   id,
+   updatedAt:Date.now(),
+   ...extra
+  });
+  setStatus("Verzonden: "+action+" · "+target);
+ }catch(error){
+  setStatus("Firebase-fout: "+error.message);
  }
 }
-function launch(){
- const colors= shellType==="rainbow"?["#ff3b30","#ff9500","#ffcc00","#34c759","#00c7be","#007aff","#bf5af2"]:palette[browser-1];
- const types=["classic","ring","heart","star","willow","glitter","comet"];
- const type=shellType==="random"?types[Math.floor(Math.random()*types.length)]:shellType;
- rockets.push({x:W*(.12+Math.random()*.76),y:H+5,target:H*(.13+Math.random()*.55),speed:4+Math.random()*3,color:colors[Math.floor(Math.random()*colors.length)],colors,type});
+
+function updatePreview(screenNumber,mode){
+ const label=document.getElementById("previewStatus"+screenNumber);
+ const canvas=document.getElementById("preview"+screenNumber);
+ if(!label||!canvas)return;
+ label.textContent=mode==="snow"?"SNEEUW":mode==="fireworks"?"VUURWERK":"UIT";
+ canvas.dataset.mode=mode;
 }
-function createSnow(){snowflakes=[];const amount=Math.max(35,Math.min(650,Math.round((W*H/6500)*(snowIntensity/55))));for(let i=0;i<amount;i++)snowflakes.push({x:Math.random()*W,y:Math.random()*H,radius:(.7+Math.random()*2.8)*(0.8+snowIntensity/180),speed:(.45+Math.random()*1.5)*(0.7+snowIntensity/130),drift:Math.random()*.8+.2,phase:Math.random()*Math.PI*2,glow:Math.random()});}
-function drawSnow(){for(const f of snowflakes){f.phase+=.012;f.y+=f.speed;f.x+=Math.sin(f.phase)*f.drift;if(f.y>H+8){f.y=-8;f.x=Math.random()*W;}if(f.x>W+8)f.x=-8;if(f.x<-8)f.x=W+8;ctx.save();ctx.globalAlpha=.48+f.glow*.45;ctx.shadowBlur=7+f.glow*9;ctx.shadowColor="#b8e9ff";ctx.fillStyle=f.glow>.72?"#fff":"#d9f2ff";ctx.beginPath();ctx.arc(f.x,f.y,f.radius,0,Math.PI*2);ctx.fill();ctx.restore();}}
-function startProjection(data){
- if(browser>2)return;
- projectionRunning=true;fireworksRunning=false;snowRunning=false;rockets=[];particles=[];projectionParticles=[];
- const finish=()=>{projectionRunning=false;if(data.mode!=="project"){for(const p of projectionParticles){particles.push({x:p.x,y:p.y,vx:(p.x-W/2)*.045+(Math.random()-.5)*5,vy:(p.y-H/2)*.045+(Math.random()-.5)*5,life:1,decay:.008+Math.random()*.012,color:p.color,size:1.4+Math.random()*2,gravity:.035});}projectionParticles=[];fireworksRunning=true;}};
- const img=new Image();
- const drawSource=()=>{
-  const off=document.createElement("canvas"),o=off.getContext("2d");off.width=220;off.height=130;o.clearRect(0,0,220,130);
-  if(data.image){o.drawImage(img,0,0,220,130);}else{o.fillStyle="#fff";o.textAlign="center";o.textBaseline="middle";let fs= data.text.length>28?19:data.text.length>16?25:34;o.font=`bold ${fs}px Arial`;const words=data.text.split(" ");let lines=[],line="";for(const word of words){const test=line?line+" "+word:word;if(o.measureText(test).width>205&&line){lines.push(line);line=word;}else line=test;}if(line)lines.push(line);lines.slice(0,3).forEach((t,i)=>o.fillText(t,110,65+(i-(Math.min(3,lines.length)-1)/2)*34,210));}
-  const pixels=o.getImageData(0,0,220,130).data,scale=Math.min(W*.82/220,H*.65/130),ox=(W-220*scale)/2,oy=(H-130*scale)/2;
-  for(let y=0;y<130;y+=2)for(let x=0;x<220;x+=2){const k=(y*220+x)*4;if(pixels[k+3]>90){projectionParticles.push({x:ox+x*scale,y:oy+y*scale,color:`rgb(${pixels[k]},${pixels[k+1]},${pixels[k+2]})`});}}
-  const started=Date.now(),duration=Number(data.duration)||4000;
-  const reveal=()=>{if(!projectionRunning)return;const elapsed=Date.now()-started;const progress=Math.min(1,elapsed/duration);ctx.fillStyle="rgba(8,8,23,.24)";ctx.fillRect(0,0,W,H);for(const p of projectionParticles){ctx.globalAlpha=.25+.75*progress;ctx.shadowBlur=progress*12;ctx.shadowColor=p.color;ctx.fillStyle=p.color;ctx.fillRect(p.x-1.4,p.y-1.4,2.8,2.8);}ctx.globalAlpha=1;ctx.shadowBlur=0;if(progress<1)requestAnimationFrame(reveal);else if(data.mode==="project"){projectionRunning=false;}else finish();};
-  reveal();
- };
- if(data.image){img.onload=drawSource;img.onerror=()=>{projectionRunning=false;console.error("Afbeelding kon niet worden geladen");};img.src=data.image;}else drawSource();
+
+function updateAllPreviews(mode,target=selectedTarget){
+ targetScreensFor(target).forEach(n=>{
+  updatePreview(n,mode);
+ });
 }
-function animate(){
- requestAnimationFrame(animate);
- if(!fireworksRunning&&!snowRunning&&!projectionRunning)return;
- if(!projectionRunning){ctx.fillStyle="rgba(8,8,23,.19)";ctx.fillRect(0,0,W,H);}
- if(snowRunning)drawSnow();
- if(fireworksRunning){
-  if(Math.random()<.012+(fireIntensity/100)*.075)launch();
-  rockets=rockets.filter(r=>{r.y-=r.speed;ctx.beginPath();ctx.arc(r.x,r.y,2.5,0,Math.PI*2);ctx.fillStyle=r.color;ctx.fill();if(r.y<=r.target){burst(r.x,r.y,r.colors,r.type);return false;}return true;});
-  particles=particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity??.045;p.vx*=.985;p.life-=p.decay;ctx.globalAlpha=Math.max(0,p.life);ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle=p.color;ctx.fill();return p.life>0;});ctx.globalAlpha=1;
+
+function targetScreensFor(target){
+ if(target==="all")return [1,2,3,4,5];
+ if(target==="1+2")return [1,2];
+ return [Number(target)];
+}
+
+function setMode(mode){
+ currentMode=mode;
+ updateAllPreviews(mode);
+ sendCommand("display-mode",selectedTarget,{displayMode:mode});
+}
+
+document.getElementById("snowButton").addEventListener("click",()=>{
+ setMode("snow");
+});
+
+document.getElementById("fireButton").addEventListener("click",()=>{
+ setMode("fireworks");
+});
+
+document.getElementById("stopButton").addEventListener("click",()=>{
+ setMode("off");
+});
+
+document.getElementById("fireIntensity").addEventListener("input",e=>{
+ document.getElementById("fireOut").value=e.target.value+"%";
+ fireIntensity=Number(e.target.value);
+});
+
+document.getElementById("snowIntensity").addEventListener("input",e=>{
+ document.getElementById("snowOut").value=e.target.value+"%";
+ snowIntensity=Number(e.target.value);
+});
+
+document.getElementById("saveFireSettings").addEventListener("click",()=>{
+ burstSize=document.getElementById("burstSize").value;
+ shellType=document.getElementById("shellType").value;
+ sendCommand("settings",selectedTarget,{
+  fireIntensity,burstSize,shellType
+ });
+});
+
+document.getElementById("saveSnowSettings").addEventListener("click",async()=>{
+ try{
+  await set(ref(db,"settings/snowIntensity"),snowIntensity);
+  setStatus("Sneeuwintensiteit opgeslagen.");
+ }catch(e){
+  setStatus("Firebase-fout: "+e.message);
  }
+});
+
+async function imageAsData(file){
+ if(file.size>700*1024)throw new Error("Afbeelding is groter dan 700 KB.");
+ return new Promise((resolve,reject)=>{
+  const reader=new FileReader();
+  reader.onload=()=>resolve(reader.result);
+  reader.onerror=reject;
+  reader.readAsDataURL(file);
+ });
 }
-animate();
 
-function applyCommand(data){
- if(!data||!data.action)return;
-  <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,signInWithEmailAndPassword,signInAnonymously,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getDatabase,ref,set,onValue} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+document.getElementById("sendProjection").addEventListener("click",async()=>{
+ try{
+  const text=document.getElementById("projectionText").value.trim();
+  const file=document.getElementById("projectionImage").files[0];
+  const image=file?await imageAsData(file):"";
+  if(!text&&!image){
+   setStatus("Vul tekst in of kies een afbeelding.");
+   return;
+  }
+  await sendCommand("projection",selectedTarget,{
+   text,image,
+   duration:Number(document.getElementById("projectionDuration").value),
+   mode:document.getElementById("projectionMode").value
+  });
+ }catch(e){
+  setStatus(e.message);
+ }
+});
 
-const firebaseConfig={
- apiKey:"AIzaSyCeSW4dzzMZStmrI9FngSKC6HXNi51Doh0",
- authDomain:"promises2u-fireworks.firebaseapp.com",
- databaseURL:"https://promises2u-fireworks-default-rtdb.europe-west1.firebasedatabase.app",
- projectId:"promises2u-fireworks",
- storageBucket:"promises2u-fireworks.firebasestorage.app",
- messagingSenderId:"270417648985",
- appId:"1:270417648985:web:9ae68d53bbb78ca102c048"
-};
-const ADMIN_UID="9FoU4AHM14W5VsIMJQviVRzIZD92";
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app);
-const params=new URLSearchParams(location.search);
-const controller=params.has("controller");
-const browser=Math.min(5,Math.max(1,Number(params.get("browser"))||1));
-const canvas=document.getElementById("fireworks"),ctx=canvas.getContext("2d");
-const palette=[["#ffd166","#ffb703","#fff1a8","#fff"],["#70d6ff","#b388ff","#f15bb5","#fff"],["#ff595e","#ffca3a","#fff","#ff924c"],["#80ed99","#57cc99","#caffbf","#fff"],["#ff70a6","#ffd670","#70d6ff","#fff"]];
-document.getElementById("number").textContent="BROWSER "+browser;
-if(controller){document.getElementById("controller").classList.remove("hidden");document.getElementById("screen").classList.add("hidden");}
+document.getElementById("clearProjection").addEventListener("click",()=>{
+ sendCommand("clear-projection","all");
+});
 
-let W=0,H=0,rockets=[],particles=[],snowflakes=[],projectionParticles=[];
-let fireworksRunning=true,snowRunning=false,projectionRunning=false;
-let fireIntensity=65,snowIntensity=55,burstSize="large",shellType="random";
-let lastProjectionId="",lastRefreshId="";
+document.querySelectorAll("[data-refresh]").forEach(button=>{
+ button.addEventListener("click",()=>{
+  sendCommand("refresh",button.dataset.refresh);
+ });
+});
+
+document.getElementById("refreshAll").addEventListener("click",()=>{
+ if(confirm("Weet je zeker dat je alle vijf schermen wilt verversen?")){
+  sendCommand("refresh","all");
+ }
+});
+
+document.getElementById("logoutButton").addEventListener("click",async()=>{
+ await signOut(auth);
+});
+
+document.getElementById("loginButton").addEventListener("click",async()=>{
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+ const message=document.getElementById("loginStatus");
+ try{
+  message.textContent="Bezig met inloggen...";
+  const result=await signInWithEmailAndPassword(auth,email,password);
+  if(result.user.uid!==ADMIN_UID){
+   await signOut(auth);
+   message.textContent="Dit account heeft geen beheerrechten.";
+  }
+ }catch(e){
+  message.textContent="Inloggen mislukt: "+e.message;
+ }
+});
+
+onAuthStateChanged(auth,async user=>{
+ if(controller){
+  const allowed=!!user&&user.uid===ADMIN_UID;
+  login.classList.toggle("hidden",allowed);
+  control.classList.toggle("hidden",!allowed);
+  if(user&&!allowed)await signOut(auth);
+ }else{
+  if(!user){
+   try{await signInAnonymously(auth);}
+   catch(e){console.error("Firebase login:",e);}
+  }
+ }
+});
+
+const canvas=document.getElementById("fireworks");
+const ctx=canvas.getContext("2d");
+let W=0,H=0;
+let rockets=[],particles=[],snowflakes=[];
+let fireworksRunning=false,snowRunning=false,projectionRunning=false;
+let projectionParticles=[];
+let animationStarted=false;
 
 function resize(){
  const d=window.devicePixelRatio||1;
  canvas.width=innerWidth*d;
  canvas.height=innerHeight*d;
  ctx.setTransform(d,0,0,d,0,0);
- W=innerWidth;
- H=innerHeight;
+ W=innerWidth;H=innerHeight;
  if(snowRunning)createSnow();
 }
 addEventListener("resize",resize);
 resize();
 
-function clearFireworks(){
- fireworksRunning=false;
- rockets=[];
- particles=[];
-}
+const colors=[
+ ["#ffd166","#ffb703","#fff1a8","#fff"],
+ ["#70d6ff","#b388ff","#f15bb5","#fff"],
+ ["#ff595e","#ffca3a","#fff","#ff924c"],
+ ["#80ed99","#57cc99","#caffbf","#fff"],
+ ["#ff70a6","#ffd670","#70d6ff","#fff"]
+];
 
-function clearAll(){
- clearFireworks();
+function clearEffects(){
+ fireworksRunning=false;
  snowRunning=false;
  projectionRunning=false;
+ rockets=[];
+ particles=[];
  projectionParticles=[];
+ snowflakes=[];
  ctx.clearRect(0,0,W,H);
-}
-
-function burst(x,y,colors,type="classic"){
- const scale=burstSize==="mega"?2.35:burstSize==="large"?1.55:1;
- const amount=Math.round((type==="glitter"?150:type==="willow"?110:82+Math.random()*65)*scale*(fireIntensity/65));
-
- for(let i=0;i<amount;i++){
-  let a=Math.random()*Math.PI*2;
-  let sp=(1.2+Math.random()*5.5)*scale;
-
-  if(type==="ring")sp=(3.2+Math.random()*.7)*scale;
-
-  if(type==="heart"){
-   const t=a;
-   const hx=16*Math.pow(Math.sin(t),3);
-   const hy=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
-   a=Math.atan2(hy,hx);
-   sp=(2.5+Math.random()*1.2)*scale;
-  }
-
-  if(type==="star"){
-   const points=5;
-   const sector=Math.floor(Math.random()*points);
-   const base=sector*2*Math.PI/points;
-   a=base+(Math.random()-.5)*.45;
-   sp=(sector%2?2.2:5)*scale;
-  }
-
-  if(type==="willow")sp=(1.2+Math.random()*3.2)*scale;
-
-  particles.push({
-   x,y,
-   vx:Math.cos(a)*sp,
-   vy:Math.sin(a)*sp,
-   life:1,
-   decay:(type==="willow"?.004:.007)+Math.random()*.012,
-   color:colors[Math.floor(Math.random()*colors.length)],
-   size:(1+Math.random()*2.5)*Math.min(2,scale),
-   gravity:type==="willow"?.025:.045
-  });
- }
-}
-
-function launch(){
- const colors=shellType==="rainbow"
-  ?["#ff3b30","#ff9500","#ffcc00","#34c759","#00c7be","#007aff","#bf5af2"]
-  :palette[browser-1];
-
- const types=["classic","ring","heart","star","willow","glitter","comet"];
- const type=shellType==="random"
-  ?types[Math.floor(Math.random()*types.length)]
-  :shellType;
-
- rockets.push({
-  x:W*(.12+Math.random()*.76),
-  y:H+5,
-  target:H*(.13+Math.random()*.55),
-  speed:4+Math.random()*3,
-  color:colors[Math.floor(Math.random()*colors.length)],
-  colors,
-  type
- });
 }
 
 function createSnow(){
  snowflakes=[];
  const amount=Math.max(35,Math.min(650,Math.round((W*H/6500)*(snowIntensity/55))));
-
  for(let i=0;i<amount;i++){
   snowflakes.push({
-   x:Math.random()*W,
-   y:Math.random()*H,
-   radius:(.7+Math.random()*2.8)*(0.8+snowIntensity/180),
+   x:Math.random()*W,y:Math.random()*H,
+   r:(.7+Math.random()*2.8)*(0.8+snowIntensity/180),
    speed:(.45+Math.random()*1.5)*(0.7+snowIntensity/130),
    drift:Math.random()*.8+.2,
-   phase:Math.random()*Math.PI*2,
-   glow:Math.random()
+   phase:Math.random()*Math.PI*2
   });
  }
 }
@@ -248,300 +478,302 @@ function drawSnow(){
   f.phase+=.012;
   f.y+=f.speed;
   f.x+=Math.sin(f.phase)*f.drift;
-
   if(f.y>H+8){f.y=-8;f.x=Math.random()*W;}
-  if(f.x>W+8)f.x=-8;
-  if(f.x<-8)f.x=W+8;
-
-  ctx.save();
-  ctx.globalAlpha=.48+f.glow*.45;
-  ctx.shadowBlur=7+f.glow*9;
-  ctx.shadowColor="#b8e9ff";
-  ctx.fillStyle=f.glow>.72?"#fff":"#d9f2ff";
   ctx.beginPath();
-  ctx.arc(f.x,f.y,f.radius,0,Math.PI*2);
+  ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
+  ctx.fillStyle="#e7f6ff";
+  ctx.globalAlpha=.5+Math.random()*.4;
+  ctx.shadowBlur=8;
+  ctx.shadowColor="#b8e9ff";
   ctx.fill();
-  ctx.restore();
+ }
+ ctx.globalAlpha=1;
+ ctx.shadowBlur=0;
+}
+
+function burst(x,y,palette,type){
+ const scale=burstSize==="mega"?2.2:burstSize==="large"?1.5:1;
+ const count=Math.round((80+Math.random()*65)*scale*(fireIntensity/65));
+ for(let i=0;i<count;i++){
+  let a=Math.random()*Math.PI*2;
+  let speed=(1.2+Math.random()*5.5)*scale;
+  if(type==="ring")speed=3.5*scale;
+  if(type==="heart"){
+   const t=a;
+   const hx=16*Math.pow(Math.sin(t),3);
+   const hy=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+   a=Math.atan2(hy,hx);
+   speed=3*scale;
+  }
+  particles.push({
+   x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,
+   life:1,decay:.008+Math.random()*.012,
+   color:palette[Math.floor(Math.random()*palette.length)],
+   size:1+Math.random()*2.5,gravity:.04
+  });
  }
 }
 
+function launch(){
+ const palette=shellType==="rainbow"
+ ?["#ff3b30","#ff9500","#ffcc00","#34c759","#00c7be","#007aff","#bf5af2"]
+ :colors[browser-1];
+ const types=["classic","ring","heart","star","willow","glitter","comet"];
+ const type=shellType==="random"?types[Math.floor(Math.random()*types.length)]:shellType;
+ rockets.push({
+  x:W*(.12+Math.random()*.76),y:H+5,
+  target:H*(.13+Math.random()*.55),
+  speed:4+Math.random()*3,
+  color:palette[Math.floor(Math.random()*palette.length)],
+  palette,type
+ });
+}
+
 function startProjection(data){
+ clearEffects();
  if(browser>2)return;
-
  projectionRunning=true;
- fireworksRunning=false;
- snowRunning=false;
- rockets=[];
- particles=[];
- projectionParticles=[];
-
- const finish=()=>{
-  projectionRunning=false;
-
-  if(data.mode!=="project"){
-   for(const p of projectionParticles){
-    particles.push({
-     x:p.x,
-     y:p.y,
-     vx:(p.x-W/2)*.045+(Math.random()-.5)*5,
-     vy:(p.y-H/2)*.045+(Math.random()-.5)*5,
-     life:1,
-     decay:.008+Math.random()*.012,
-     color:p.color,
-     size:1.4+Math.random()*2,
-     gravity:.035
-    });
-   }
-
-   projectionParticles=[];
-   fireworksRunning=true;
-  }
- };
-
  const img=new Image();
 
- const drawSource=()=>{
+ const render=()=>{
   const off=document.createElement("canvas");
+  off.width=220;off.height=130;
   const o=off.getContext("2d");
-  off.width=220;
-  off.height=130;
-  o.clearRect(0,0,220,130);
-
   if(data.image){
    o.drawImage(img,0,0,220,130);
   }else{
-   o.fillStyle="#fff";
+   o.fillStyle="white";
+   o.font="bold 30px Arial";
    o.textAlign="center";
    o.textBaseline="middle";
-
-   let fs=data.text.length>28?19:data.text.length>16?25:34;
-   o.font=`bold ${fs}px Arial`;
-
-   const words=data.text.split(" ");
-   let lines=[],line="";
-
-   for(const word of words){
-    const test=line?line+" "+word:word;
-
-    if(o.measureText(test).width>205&&line){
-     lines.push(line);
-     line=word;
-    }else{
-     line=test;
-    }
-   }
-
-   if(line)lines.push(line);
-
-   lines.slice(0,3).forEach((t,i)=>
-    o.fillText(t,110,65+(i-(Math.min(3,lines.length)-1)/2)*34,210)
-   );
+   o.fillText(data.text||"",110,65,210);
   }
-
   const pixels=o.getImageData(0,0,220,130).data;
   const scale=Math.min(W*.82/220,H*.65/130);
-  const ox=(W-220*scale)/2;
-  const oy=(H-130*scale)/2;
-
+  const ox=(W-220*scale)/2,oy=(H-130*scale)/2;
+  projectionParticles=[];
   for(let y=0;y<130;y+=2){
    for(let x=0;x<220;x+=2){
     const k=(y*220+x)*4;
-
     if(pixels[k+3]>90){
      projectionParticles.push({
-      x:ox+x*scale,
-      y:oy+y*scale,
+      x:ox+x*scale,y:oy+y*scale,
       color:`rgb(${pixels[k]},${pixels[k+1]},${pixels[k+2]})`
      });
     }
    }
   }
-
-  const started=Date.now();
-  const duration=Number(data.duration)||4000;
-
-  const reveal=()=>{
+  const start=Date.now(),duration=Number(data.duration)||4000;
+  function reveal(){
    if(!projectionRunning)return;
-
-   const elapsed=Date.now()-started;
-   const progress=Math.min(1,elapsed/duration);
-
-   ctx.fillStyle="rgba(8,8,23,.24)";
+   const progress=Math.min(1,(Date.now()-start)/duration);
+   ctx.fillStyle="rgba(8,8,23,.25)";
    ctx.fillRect(0,0,W,H);
-
    for(const p of projectionParticles){
     ctx.globalAlpha=.25+.75*progress;
-    ctx.shadowBlur=progress*12;
-    ctx.shadowColor=p.color;
     ctx.fillStyle=p.color;
-    ctx.fillRect(p.x-1.4,p.y-1.4,2.8,2.8);
+    ctx.fillRect(p.x,p.y,3,3);
    }
-
    ctx.globalAlpha=1;
-   ctx.shadowBlur=0;
-
-   if(progress<1){
-    requestAnimationFrame(reveal);
-   }else if(data.mode==="project"){
+   if(progress<1)requestAnimationFrame(reveal);
+   else if(data.mode==="project")projectionRunning=false;
+   else{
+    for(const p of projectionParticles){
+     particles.push({
+      x:p.x,y:p.y,
+      vx:(p.x-W/2)*.045+(Math.random()-.5)*5,
+      vy:(p.y-H/2)*.045+(Math.random()-.5)*5,
+      life:1,decay:.01,color:p.color,size:2,gravity:.035
+     });
+    }
+    projectionParticles=[];
     projectionRunning=false;
-   }else{
-    finish();
+    fireworksRunning=true;
    }
-  };
-
+  }
   reveal();
  };
-
  if(data.image){
-  img.onload=drawSource;
-  img.onerror=()=>{
-   projectionRunning=false;
-   console.error("Afbeelding kon niet worden geladen");
-  };
+  img.onload=render;
+  img.onerror=()=>{projectionRunning=false;console.error("Projectieafbeelding kon niet worden geladen");};
   img.src=data.image;
- }else{
-  drawSource();
- }
+ }else render();
 }
 
 function animate(){
  requestAnimationFrame(animate);
-
  if(!fireworksRunning&&!snowRunning&&!projectionRunning)return;
-
  if(!projectionRunning){
   ctx.fillStyle="rgba(8,8,23,.19)";
   ctx.fillRect(0,0,W,H);
  }
-
  if(snowRunning)drawSnow();
-
  if(fireworksRunning){
   if(Math.random()<.012+(fireIntensity/100)*.075)launch();
-
   rockets=rockets.filter(r=>{
    r.y-=r.speed;
-   ctx.beginPath();
-   ctx.arc(r.x,r.y,2.5,0,Math.PI*2);
-   ctx.fillStyle=r.color;
-   ctx.fill();
-
-   if(r.y<=r.target){
-    burst(r.x,r.y,r.colors,r.type);
-    return false;
-   }
+   ctx.beginPath();ctx.arc(r.x,r.y,2.5,0,Math.PI*2);
+   ctx.fillStyle=r.color;ctx.fill();
+   if(r.y<=r.target){burst(r.x,r.y,r.palette,r.type);return false;}
    return true;
   });
-
   particles=particles.filter(p=>{
-   p.x+=p.vx;
-   p.y+=p.vy;
-   p.vy+=p.gravity??.045;
-   p.vx*=.985;
-   p.life-=p.decay;
-
+   p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.vx*=.985;p.life-=p.decay;
    ctx.globalAlpha=Math.max(0,p.life);
-   ctx.beginPath();
-   ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-   ctx.fillStyle=p.color;
-   ctx.fill();
-
+   ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+   ctx.fillStyle=p.color;ctx.fill();
    return p.life>0;
   });
-
   ctx.globalAlpha=1;
  }
 }
+if(!animationStarted){animationStarted=true;animate();}
 
-animate();
-   if(data.action==="display-mode"){
-  if(data.target!=="all"&&Number(data.target)!==browser)return;
-  projectionRunning=false;projectionParticles=[];rockets=[];particles=[];
-  const selected=data.displayMode||"off";
-  snowRunning=selected==="snow"&&browser<=2;
-  fireworksRunning=selected==="fireworks";
-  if(snowRunning)createSnow();
-  if(selected==="off"||(selected==="snow"&&browser>2))ctx.clearRect(0,0,W,H);
-  return;
- }
+function applyCommand(data){
+ if(!data||!data.action)return;
+ if(data.id&&data.id===lastCommand)return;
+ if(data.id)lastCommand=data.id;
+
  if(data.action==="refresh"){
-  if(data.id===lastRefreshId)return;
-  if(Date.now()-Number(data.updatedAt)>30000)return;
-  if(data.target==="all"||Number(data.target)===browser){lastRefreshId=data.id;sessionStorage.setItem("p2u_refresh",data.id);location.reload();}
+  if(data.target==="all"||Number(data.target)===browser){
+   if(Date.now()-Number(data.updatedAt)<30000)location.reload();
+  }
   return;
- }
- if(data.action==="snow-on"||data.action==="snow-off"){
-  if(browser>2||(data.target!=="all"&&Number(data.target)!==browser))return;
-  clearFireworks();projectionRunning=false;snowRunning=data.action==="snow-on";if(snowRunning)createSnow();else ctx.clearRect(0,0,W,H);return;
- }
- if(data.action==="projection"){
-  if(browser>2||(data.target!=="all"&&Number(data.target)!==browser)||data.id===lastProjectionId)return;
-  lastProjectionId=data.id;startProjection(data);return;
  }
  if(data.target!=="all"&&Number(data.target)!==browser)return;
- if(data.action==="settings"){fireIntensity=Number(data.fireIntensity)||65;burstSize=data.burstSize||"large";shellType=data.shellType||"random";return;}
- if(data.action==="start"||data.action==="resume"){snowRunning=false;projectionRunning=false;fireworksRunning=true;particles=[];rockets=[];}
- if(data.action==="pause")fireworksRunning=false;
- if(data.action==="stop")clearAll();
- if(data.action==="clear-projection"&&browser<=2){projectionRunning=false;projectionParticles=[];ctx.clearRect(0,0,W,H);}
-}
-if(controller){
- const loginArea=document.getElementById("login"),controlsArea=document.getElementById("controlsArea"),loginStatus=document.getElementById("loginStatus"),status=document.getElementById("status");
- onAuthStateChanged(auth,user=>{const ok=!!user&&user.uid===ADMIN_UID;loginArea.classList.toggle("hidden",ok);controlsArea.classList.toggle("hidden",!ok);if(user&&!ok){signOut(auth);loginStatus.textContent="Geen beheerrechten voor dit account."; }});
- document.getElementById("loginButton").addEventListener("click",async()=>{const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;if(!email||!password){loginStatus.textContent="Vul e-mailadres en wachtwoord in.";return;}loginStatus.textContent="Bezig met inloggen...";try{const result=await signInWithEmailAndPassword(auth,email,password);if(result.user.uid!==ADMIN_UID){await signOut(auth);loginStatus.textContent="Dit account heeft geen beheerrechten.";}}catch(e){loginStatus.textContent="Inloggen mislukt: "+e.message;}});
- async function send(action,target=document.getElementById("target").value,extra={}){const user=auth.currentUser;if(!user||user.uid!==ADMIN_UID){status.textContent="Geen beheerrechten.";return;}status.textContent="Opdracht verzenden...";try{const id=crypto.randomUUID();await set(ref(db,"show"),{action,target,id,updatedAt:Date.now(),...extra});status.textContent="Verzonden: "+action+" · "+target;}catch(e){status.textContent="Verzenden mislukt: "+e.message;}}
- const fireworksToggle=document.getElementById("fireworksToggle");
- const snowToggle=document.getElementById("snowToggle");
- let updatingModeChecks=false;
- function reflectMode(mode){
-  updatingModeChecks=true;
-  fireworksToggle.checked=mode==="fireworks";
-  snowToggle.checked=mode==="snow";
-  updatingModeChecks=false;
+
+ if(data.action==="display-mode"){
+  clearEffects();
+  const mode=data.displayMode||"off";
+  if(mode==="snow"&&browser<=2){
+   snowRunning=true;createSnow();
+  }else if(mode==="fireworks"){
+   fireworksRunning=true;
+  }
+  return;
  }
- async function chooseMode(mode){
-  if(updatingModeChecks)return;
-  if(mode==="fireworks")reflectMode("fireworks");
-  else if(mode==="snow")reflectMode("snow");
-  else reflectMode("off");
-  await send("display-mode",document.getElementById("target").value,{displayMode:mode});
+ if(data.action==="start"||data.action==="resume"){
+  clearEffects();fireworksRunning=true;return;
  }
- fireworksToggle.addEventListener("change",()=>chooseMode(fireworksToggle.checked?"fireworks":"off"));
- snowToggle.addEventListener("change",()=>chooseMode(snowToggle.checked?"snow":"off"));
- onValue(ref(db,"show"),snapshot=>{
-  const data=snapshot.val();
-  if(!data)return;
-  if(data.action==="display-mode")reflectMode(data.displayMode||"off");
-  else if(data.action==="snow-on")reflectMode("snow");
-  else if(data.action==="snow-off"||data.action==="stop")reflectMode("off");
-  else if(data.action==="start"||data.action==="resume")reflectMode("fireworks");
- });
- document.querySelectorAll("[data-action]").forEach(b=>b.addEventListener("click",async()=>{
-  const action=b.dataset.action;
-  if(action==="start"||action==="resume")reflectMode("fireworks");
-  if(action==="stop")reflectMode("off");
-  await send(action);
- }));
- const fi=document.getElementById("fireIntensity"),si=document.getElementById("snowIntensity");
- fi.addEventListener("input",()=>document.getElementById("fireIntensityOut").value=fi.value+"%");
- si.addEventListener("input",()=>document.getElementById("snowIntensityOut").value=si.value+"%");
- document.getElementById("saveFireSettings").addEventListener("click",()=>send("settings",document.getElementById("target").value,{fireIntensity:Number(fi.value),burstSize:document.getElementById("burstSize").value,shellType:document.getElementById("shellType").value}));
- document.getElementById("saveSnowIntensity").addEventListener("click",async()=>{try{await set(ref(db,"settings/snowIntensity"),Number(si.value));status.textContent="Sneeuwintensiteit toegepast: "+si.value+"%";}catch(e){status.textContent="Opslaan mislukt: "+e.message;}});
- async function fileToDataUrl(file){if(file.size>700*1024)throw new Error("Kies een afbeelding kleiner dan 700 KB.");return await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});}
- document.getElementById("sendProjection").addEventListener("click",async()=>{try{let image="",textValue=document.getElementById("projectionText").value.trim();const file=document.getElementById("projectionImage").files[0];if(file)image=await fileToDataUrl(file);if(!image&&!textValue){status.textContent="Vul tekst in of kies een afbeelding.";return;}await send("projection",document.getElementById("target").value,{image,text:textValue,duration:Number(document.getElementById("projectionDuration").value),mode:document.getElementById("projectionMode").value});}catch(e){status.textContent=e.message;}});
- document.getElementById("clearProjection").addEventListener("click",()=>send("clear-projection","all"));
- document.querySelectorAll("[data-refresh]").forEach(b=>b.addEventListener("click",()=>send("refresh",b.dataset.refresh)));
- document.getElementById("refreshAll").addEventListener("click",()=>{if(confirm("Weet je zeker dat je alle vijf schermen wilt verversen? De huidige show wordt onderbroken."))send("refresh","all");});
- document.getElementById("logoutButton").addEventListener("click",async()=>{await signOut(auth);status.textContent="Uitgelogd.";});
+ if(data.action==="stop"){clearEffects();return;}
+ if(data.action==="pause"){fireworksRunning=false;return;}
+ if(data.action==="settings"){
+  fireIntensity=Number(data.fireIntensity)||65;
+  burstSize=data.burstSize||"large";
+  shellType=data.shellType||"random";
+  return;
+ }
+ if(data.action==="snow-on"&&browser<=2){
+  clearEffects();snowRunning=true;createSnow();return;
+ }
+ if(data.action==="snow-off"&&browser<=2){
+  clearEffects();return;
+ }
+ if(data.action==="projection"&&browser<=2){
+  if(data.id===lastProjection)return;
+  lastProjection=data.id;
+  startProjection(data);return;
+ }
+ if(data.action==="clear-projection"&&browser<=2){
+  clearEffects();
+ }
 }
+
 if(!controller){
- let listenerStarted=false;
- onAuthStateChanged(auth,async user=>{if(!user){try{await signInAnonymously(auth);}catch(e){console.error("Anonieme login mislukt:",e);}return;}
-  if(user.isAnonymous&&!listenerStarted){listenerStarted=true;
-   onValue(ref(db,"show"),s=>{const d=s.val();if(d)applyCommand(d);},e=>console.error("Firebase leesfout:",e));
-   onValue(ref(db,"settings/snowIntensity"),s=>{const v=Number(s.val());if(v>=10&&v<=100){snowIntensity=v;if(snowRunning)createSnow();}},e=>console.error("Sneeuwinstelling leesfout:",e));
+ let connected=false;
+ onAuthStateChanged(auth,async user=>{
+  if(!user){
+   try{await signInAnonymously(auth);}
+   catch(e){console.error(e);}
+   return;
+  }
+  if(user.isAnonymous&&!connected){
+   connected=true;
+   onValue(ref(db,"show"),snapshot=>{
+    const data=snapshot.val();
+    if(data)applyCommand(data);
+   },error=>console.error("Firebase show:",error));
+   onValue(ref(db,"settings/snowIntensity"),snapshot=>{
+    const value=Number(snapshot.val());
+    if(value>=10&&value<=100){
+     snowIntensity=value;
+     if(snowRunning)createSnow();
+    }
+   });
   }
  });
+}
+
+if(controller){
+ let showListener=false;
+ onAuthStateChanged(auth,user=>{
+  if(user&&user.uid===ADMIN_UID&&!showListener){
+   showListener=true;
+   onValue(ref(db,"show"),snapshot=>{
+    const data=snapshot.val();
+    if(!data)return;
+    if(data.action==="display-mode"){
+     updateAllPreviews(data.displayMode||"off",data.target);
+    }else if(data.action==="stop"){
+     updateAllPreviews("off",data.target);
+    }else if(data.action==="start"||data.action==="resume"){
+     updateAllPreviews("fireworks",data.target);
+    }else if(data.action==="snow-on"){
+     updateAllPreviews("snow",data.target);
+    }else if(data.action==="snow-off"){
+     updateAllPreviews("off",data.target);
+    }
+   });
+  }
+ });
+}
+
+function startPreview(canvas,mode){
+ const c=canvas.getContext("2d");
+ const w=canvas.width=canvas.clientWidth*2;
+ const h=canvas.height=canvas.clientHeight*2;
+ let dots=[];
+ for(let i=0;i<30;i++)dots.push({x:Math.random()*w,y:Math.random()*h,v:1+Math.random()*2});
+ function draw(){
+  c.fillStyle="#050914";c.fillRect(0,0,w,h);
+  if(mode==="snow"){
+   c.fillStyle="#e5f5ff";
+   for(const p of dots){
+    p.y+=p.v;
+    if(p.y>h)p.y=0;
+    c.beginPath();c.arc(p.x,p.y,2,0,Math.PI*2);c.fill();
+   }
+  }else if(mode==="fireworks"){
+   for(let i=0;i<12;i++){
+    const x=Math.random()*w,y=Math.random()*h;
+    c.fillStyle=colors[canvas.dataset.screen-1][i%4];
+    c.globalAlpha=.8;
+    c.beginPath();c.arc(x,y,1+Math.random()*3,0,Math.PI*2);c.fill();
+   }
+   c.globalAlpha=1;
+  }
+  if(canvas.dataset.mode===mode)requestAnimationFrame(draw);
+ }
+ draw();
+}
+
+for(let n=1;n<=5;n++){
+ const c=document.getElementById("preview"+n);
+ c.dataset.screen=n;
+ c.dataset.mode="off";
+ const original=updatePreview;
+ updatePreview=function(number,mode){
+  original(number,mode);
+  const target=document.getElementById("preview"+number);
+  if(target){
+   target.dataset.mode=mode;
+   if(mode!=="off")startPreview(target,mode);
+   else{
+    const x=target.getContext("2d");
+    x.clearRect(0,0,target.width,target.height);
+   }
+  }
+ };
 }
 </script>
 </body>
