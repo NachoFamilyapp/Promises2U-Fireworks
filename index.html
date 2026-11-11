@@ -47,6 +47,12 @@ textarea{min-height:75px;resize:vertical}
 .screen-select{display:grid;grid-template-columns:repeat(auto-fit,minmax(75px,1fr));gap:8px}
 .screen-select button{padding:12px 5px}
 .screen-select button.selected{background:#3478f6;outline:2px solid #a8c8ff}
+.style-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-top:10px}
+.style-card{padding:8px;text-align:left;background:#091326;border:1px solid #344967;border-radius:11px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.style-card canvas{width:100%;height:82px;display:block;background:#030711;border-radius:7px}
+.style-card b{font-size:12px;color:#fff}
+.style-card small{font-size:10px;line-height:1.35;color:var(--muted);font-weight:normal}
+.style-card.selected{border:2px solid #e9ad42;background:#1a2943;box-shadow:0 0 14px #e9ad4233}
 @media(max-width:600px){header h1{font-size:21px}.panel{padding:13px}main{width:94%}}
 </style>
 </head>
@@ -117,17 +123,36 @@ textarea{min-height:75px;resize:vertical}
 <option value="mega">Mega</option>
 </select>
 <label>Vuurwerkstijl</label>
-<select id="shellType">
+<select id="shellType" class="hidden">
 <option value="random">Willekeurig</option>
-<option value="classic">Classic</option>
-<option value="comet">Comet</option>
-<option value="glitter">Glitter</option>
-<option value="rainbow">Rainbow</option>
+<option value="chrysanthemum">Chrysanthemum</option>
+<option value="peony">Peony</option>
+<option value="palm">Palm</option>
+<option value="willow">Golden Willow</option>
+<option value="crossette">Crossette</option>
+<option value="kamuro">Kamuro</option>
 <option value="ring">Ring</option>
 <option value="heart">Heart</option>
 <option value="star">Star</option>
-<option value="willow">Golden Willow</option>
+<option value="comet">Comet</option>
+<option value="glitter">Glitter</option>
+<option value="rainbow">Rainbow</option>
 </select>
+<div class="style-grid" id="styleGrid">
+<button type="button" class="style-card selected" data-style="chrysanthemum"><canvas id="stylePreview-chrysanthemum"></canvas><b>Chrysanthemum</b><small>Grote gouden bloemexplosie</small></button>
+<button type="button" class="style-card" data-style="peony"><canvas id="stylePreview-peony"></canvas><b>Peony</b><small>Ronde kleurrijke explosie</small></button>
+<button type="button" class="style-card" data-style="palm"><canvas id="stylePreview-palm"></canvas><b>Palm</b><small>Lange gouden lichttakken</small></button>
+<button type="button" class="style-card" data-style="willow"><canvas id="stylePreview-willow"></canvas><b>Golden Willow</b><small>Hangende gouden vonken</small></button>
+<button type="button" class="style-card" data-style="crossette"><canvas id="stylePreview-crossette"></canvas><b>Crossette</b><small>Vonk splitst in kleinere sterren</small></button>
+<button type="button" class="style-card" data-style="kamuro"><canvas id="stylePreview-kamuro"></canvas><b>Kamuro</b><small>Brede gouden waterval</small></button>
+<button type="button" class="style-card" data-style="ring"><canvas id="stylePreview-ring"></canvas><b>Ring</b><small>Perfecte cirkel</small></button>
+<button type="button" class="style-card" data-style="heart"><canvas id="stylePreview-heart"></canvas><b>Heart</b><small>Hartvormige explosie</small></button>
+<button type="button" class="style-card" data-style="star"><canvas id="stylePreview-star"></canvas><b>Star</b><small>Stervormige explosie</small></button>
+<button type="button" class="style-card" data-style="comet"><canvas id="stylePreview-comet"></canvas><b>Comet</b><small>Lichtspoor met felle kop</small></button>
+<button type="button" class="style-card" data-style="glitter"><canvas id="stylePreview-glitter"></canvas><b>Glitter</b><small>Fijne sprankelende vonken</small></button>
+<button type="button" class="style-card" data-style="rainbow"><canvas id="stylePreview-rainbow"></canvas><b>Rainbow</b><small>Alle kleuren van de regenboog</small></button>
+</div>
+<p class="small" id="styleStatus">Geselecteerd: Chrysanthemum</p>
 <button id="saveFireSettings" class="goldbtn" style="width:100%;margin-top:13px">INSTELLINGEN TOEPASSEN</button>
 </section>
 
@@ -262,10 +287,11 @@ async function sendCommand(action,target=selectedTarget,extra={}){
   return;
  }
  const id=crypto.randomUUID();
+ const commandTarget=target;
  try{
   await set(ref(db,"show"),{
    action,
-   target,
+   target:commandTarget,
    id,
    updatedAt:Date.now(),
    ...extra
@@ -273,21 +299,6 @@ async function sendCommand(action,target=selectedTarget,extra={}){
   setStatus("Verzonden: "+action+" · "+target);
  }catch(error){
   setStatus("Firebase-fout: "+error.message);
- }
-}
-
-function updatePreview(screenNumber,mode){
- const label=document.getElementById("previewStatus"+screenNumber);
- const previewCanvas=document.getElementById("preview"+screenNumber);
- if(!label||!previewCanvas)return;
- label.textContent=mode==="snow"?"SNEEUW":mode==="fireworks"?"VUURWERK":"UIT";
- previewCanvas.dataset.mode=mode;
- if(mode==="off"){
-  previewCanvas.dataset.loopId=String(Number(previewCanvas.dataset.loopId||0)+1);
-  const previewContext=previewCanvas.getContext("2d");
-  previewContext.clearRect(0,0,previewCanvas.width,previewCanvas.height);
- }else{
-  startPreview(previewCanvas,mode);
  }
 }
 
@@ -331,6 +342,15 @@ document.getElementById("snowIntensity").addEventListener("input",e=>{
  snowIntensity=Number(e.target.value);
 });
 
+const styleNames={chrysanthemum:"Chrysanthemum",peony:"Peony",palm:"Palm",willow:"Golden Willow",crossette:"Crossette",kamuro:"Kamuro",ring:"Ring",heart:"Heart",star:"Star",comet:"Comet",glitter:"Glitter",rainbow:"Rainbow"};
+document.querySelectorAll("[data-style]").forEach(button=>{
+ button.addEventListener("click",()=>{
+  shellType=button.dataset.style;
+  document.getElementById("shellType").value=shellType;
+  document.querySelectorAll("[data-style]").forEach(card=>card.classList.toggle("selected",card===button));
+  document.getElementById("styleStatus").textContent="Geselecteerd: "+styleNames[shellType];
+ });
+});
 document.getElementById("saveFireSettings").addEventListener("click",()=>{
  burstSize=document.getElementById("burstSize").value;
  shellType=document.getElementById("shellType").value;
@@ -435,12 +455,6 @@ let fireworksRunning=false,snowRunning=false,projectionRunning=false;
 let projectionParticles=[];
 let animationStarted=false;
 
-function ensureAnimation(){
- if(animationStarted)return;
- animationStarted=true;
- requestAnimationFrame(animate);
-}
-
 function resize(){
  const d=window.devicePixelRatio||1;
  canvas.width=innerWidth*d;
@@ -510,6 +524,16 @@ function burst(x,y,palette,type){
   let a=Math.random()*Math.PI*2;
   let speed=(1.2+Math.random()*5.5)*scale;
   if(type==="ring")speed=3.5*scale;
+  if(type==="palm")speed=(2.0+Math.random()*3.0)*scale;
+  if(type==="willow"||type==="kamuro")speed=(1.0+Math.random()*4.2)*scale;
+  if(type==="glitter")speed=(.7+Math.random()*3.4)*scale;
+  if(type==="crossette")speed=(1.4+Math.random()*5.0)*scale;
+  if(type==="star"){
+   const points=5,sector=Math.PI*2/points;
+   const slot=Math.floor(Math.random()*points);
+   a=slot*sector+(Math.random()-.5)*.28;
+   speed=3.8*scale;
+  }
   if(type==="heart"){
    const t=a;
    const hx=16*Math.pow(Math.sin(t),3);
@@ -519,7 +543,7 @@ function burst(x,y,palette,type){
   }
   particles.push({
    x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,
-   life:1,decay:.008+Math.random()*.012,
+   life:1,decay:(type==="willow"||type==="kamuro"?.005:.008)+Math.random()*.012,
    color:palette[Math.floor(Math.random()*palette.length)],
    size:1+Math.random()*2.5,gravity:.04
   });
@@ -530,7 +554,7 @@ function launch(){
  const palette=shellType==="rainbow"
  ?["#ff3b30","#ff9500","#ffcc00","#34c759","#00c7be","#007aff","#bf5af2"]
  :colors[browser-1];
- const types=["classic","ring","heart","star","willow","glitter","comet"];
+ const types=["chrysanthemum","peony","palm","willow","crossette","kamuro","ring","heart","star","comet","glitter","rainbow"];
  const type=shellType==="random"?types[Math.floor(Math.random()*types.length)]:shellType;
  rockets.push({
   x:W*(.12+Math.random()*.76),y:H+5,
@@ -545,7 +569,6 @@ function startProjection(data){
  clearEffects();
  if(browser>2)return;
  projectionRunning=true;
- ensureAnimation();
  const img=new Image();
 
  const render=()=>{
@@ -614,11 +637,8 @@ function startProjection(data){
 }
 
 function animate(){
- if(!fireworksRunning&&!snowRunning&&!projectionRunning){
-  animationStarted=false;
-  return;
- }
  requestAnimationFrame(animate);
+ if(!fireworksRunning&&!snowRunning&&!projectionRunning)return;
  if(!projectionRunning){
   ctx.fillStyle="rgba(8,8,23,.19)";
   ctx.fillRect(0,0,W,H);
@@ -643,6 +663,7 @@ function animate(){
   ctx.globalAlpha=1;
  }
 }
+if(!animationStarted){animationStarted=true;animate();}
 
 function applyCommand(data){
  if(!data||!data.action)return;
@@ -650,22 +671,18 @@ function applyCommand(data){
  if(data.id)lastCommand=data.id;
 
  if(data.action==="refresh"){
-  const refreshTargets=data.target==="all"?[1,2,3,4,5]:data.target==="1+2"?[1,2]:[Number(data.target)];
-  if(refreshTargets.includes(browser)){
-   const refreshId=String(data.id||data.updatedAt||"");
-   const storageKey="promises2u-refresh-"+browser;
-   const handledId=sessionStorage.getItem(storageKey);
-   const commandAge=Date.now()-Number(data.updatedAt);
-   if(refreshId&&handledId!==refreshId&&commandAge>=0&&commandAge<30000){
-    sessionStorage.setItem(storageKey,refreshId);
+  if(data.target==="all"||Number(data.target)===browser){
+   const refreshKey="promises2u-refresh-"+browser;
+   const handled=sessionStorage.getItem(refreshKey);
+   if(Date.now()-Number(data.updatedAt)<30000&&handled!==String(data.id||data.updatedAt)){
+    sessionStorage.setItem(refreshKey,String(data.id||data.updatedAt));
     location.reload();
    }
   }
   return;
  }
-
- const commandTargets=data.target==="all"?[1,2,3,4,5]:data.target==="1+2"?[1,2]:[Number(data.target)];
- if(!commandTargets.includes(browser))return;
+ if(data.target!=="all"&&data.target!=="1+2"&&Number(data.target)!==browser)return;
+ if(data.target==="1+2"&&browser>2)return;
 
  if(data.action==="display-mode"){
   clearEffects();
@@ -675,11 +692,10 @@ function applyCommand(data){
   }else if(mode==="fireworks"){
    fireworksRunning=true;
   }
-  if(fireworksRunning||snowRunning)ensureAnimation();
   return;
  }
  if(data.action==="start"||data.action==="resume"){
-  clearEffects();fireworksRunning=true;ensureAnimation();return;
+  clearEffects();fireworksRunning=true;return;
  }
  if(data.action==="stop"){clearEffects();return;}
  if(data.action==="pause"){fireworksRunning=false;return;}
@@ -690,7 +706,7 @@ function applyCommand(data){
   return;
  }
  if(data.action==="snow-on"&&browser<=2){
-  clearEffects();snowRunning=true;createSnow();ensureAnimation();return;
+  clearEffects();snowRunning=true;createSnow();return;
  }
  if(data.action==="snow-off"&&browser<=2){
   clearEffects();return;
@@ -754,55 +770,80 @@ if(controller){
  });
 }
 
-function startPreview(previewCanvas,mode){
- const context=previewCanvas.getContext("2d");
- const width=Math.max(1,Math.round(previewCanvas.clientWidth*2));
- const height=Math.max(1,Math.round(previewCanvas.clientHeight*2));
- previewCanvas.width=width;
- previewCanvas.height=height;
- const loopId=Number(previewCanvas.dataset.loopId||0)+1;
- previewCanvas.dataset.loopId=String(loopId);
- const dots=[];
- for(let i=0;i<30;i++)dots.push({x:Math.random()*width,y:Math.random()*height,v:1+Math.random()*2});
-
- function draw(){
-  if(previewCanvas.dataset.mode!==mode||Number(previewCanvas.dataset.loopId)!==loopId)return;
-  context.fillStyle="#050914";
-  context.fillRect(0,0,width,height);
-  if(mode==="snow"){
-   context.fillStyle="#e5f5ff";
-   for(const p of dots){
-    p.y+=p.v;
-    if(p.y>height)p.y=0;
-    context.beginPath();
-    context.arc(p.x,p.y,2,0,Math.PI*2);
-    context.fill();
+const previewLoops=new Map();
+function startPreview(canvas,mode){
+ const key=canvas.id;
+ if(previewLoops.has(key))return;
+ const c=canvas.getContext("2d");
+ const w=canvas.width=Math.max(1,canvas.clientWidth*2);
+ const h=canvas.height=Math.max(1,canvas.clientHeight*2);
+ const dots=Array.from({length:42},()=>({x:Math.random()*w,y:Math.random()*h,v:.7+Math.random()*2.2,a:Math.random()*6.28}));
+ const loop=()=>{
+  c.fillStyle="#030711";c.fillRect(0,0,w,h);
+  if(canvas.dataset.mode==="snow"){
+   c.fillStyle="#e5f5ff";
+   for(const p of dots){p.y+=p.v;p.x+=Math.sin(p.a+=.025)*.45;if(p.y>h)p.y=0;c.beginPath();c.arc(p.x,p.y,2,0,Math.PI*2);c.fill();}
+  }else if(canvas.dataset.mode==="fireworks"){
+   const t=Date.now()/650;
+   for(let i=0;i<38;i++){
+    const angle=i*Math.PI*2/38;
+    const radius=(Math.sin(t+i*.17)*.12+.35)*Math.min(w,h);
+    const x=w/2+Math.cos(angle)*radius,y=h/2+Math.sin(angle)*radius;
+    c.fillStyle=colors[(Number(canvas.dataset.screen)-1)%5][i%4];
+    c.globalAlpha=.55+.45*Math.sin(t+i);
+    c.beginPath();c.arc(x,y,1.5+(i%3),0,Math.PI*2);c.fill();
    }
-  }else if(mode==="fireworks"){
-   const screenIndex=Math.max(0,Math.min(4,Number(previewCanvas.dataset.screen)-1));
-   for(let i=0;i<12;i++){
-    const x=Math.random()*width,y=Math.random()*height;
-    context.fillStyle=colors[screenIndex][i%4];
-    context.globalAlpha=.8;
-    context.beginPath();
-    context.arc(x,y,1+Math.random()*3,0,Math.PI*2);
-    context.fill();
-   }
-   context.globalAlpha=1;
+   c.globalAlpha=1;
   }
-  requestAnimationFrame(draw);
- }
- draw();
+  if(canvas.dataset.mode!=="off")requestAnimationFrame(loop);
+  else{c.clearRect(0,0,w,h);previewLoops.delete(key);}
+ };
+ previewLoops.set(key,true);loop();
 }
-
+function updatePreview(screenNumber,mode){
+ const label=document.getElementById("previewStatus"+screenNumber);
+ const canvas=document.getElementById("preview"+screenNumber);
+ if(!label||!canvas)return;
+ label.textContent=mode==="snow"?"SNEEUW":mode==="fireworks"?"VUURWERK":"UIT";
+ canvas.dataset.mode=mode;
+ if(mode!=="off")startPreview(canvas,mode);
+ else{const c=canvas.getContext("2d");c.clearRect(0,0,canvas.width,canvas.height);previewLoops.delete(canvas.id);}
+}
 for(let n=1;n<=5;n++){
- const previewCanvas=document.getElementById("preview"+n);
- if(previewCanvas){
-  previewCanvas.dataset.screen=String(n);
-  previewCanvas.dataset.mode="off";
-  previewCanvas.dataset.loopId="0";
- }
+ const c=document.getElementById("preview"+n);
+ c.dataset.screen=n;c.dataset.mode="off";
 }
+function drawStylePreviews(){
+ const styleList=["chrysanthemum","peony","palm","willow","crossette","kamuro","ring","heart","star","comet","glitter","rainbow"];
+ styleList.forEach((style,index)=>{
+  const cv=document.getElementById("stylePreview-"+style);
+  if(!cv)return;
+  const g=cv.getContext("2d");
+  const w=cv.width=Math.max(1,cv.clientWidth*2),h=cv.height=164;
+  const palette=style==="rainbow"?["#ff3b30","#ff9500","#ffcc00","#34c759","#00c7be","#007aff","#bf5af2"]:["#ffd166","#ffb703","#fff1a8","#ffffff"];
+  const dots=Array.from({length:52},(_,i)=>({a:Math.PI*2*i/52,r:10+Math.random()*23,v:.5+Math.random()*1.1,phase:Math.random()*6.28}));
+  const draw=()=>{
+   g.fillStyle="#030711";g.fillRect(0,0,w,h);
+   const t=Date.now()/700;
+   dots.forEach((p,i)=>{
+    let a=p.a+t*.12;
+    let r=p.r+Math.sin(t*p.v+p.phase)*5;
+    if(style==="ring")r=29+Math.sin(t+p.phase)*2;
+    if(style==="star")r=(i%2?18:37)+Math.sin(t+p.phase)*3;
+    if(style==="heart"){const q=a;const hx=16*Math.pow(Math.sin(q),3),hy=-(13*Math.cos(q)-5*Math.cos(2*q)-2*Math.cos(3*q)-Math.cos(4*q));g.fillStyle=palette[i%palette.length];g.globalAlpha=.9;g.beginPath();g.arc(w/2+hx*1.25,h/2+hy*.85,2.5,0,6.28);g.fill();return;}
+    if(style==="palm"||style==="willow"||style==="kamuro")r*=.7+Math.abs(Math.sin(a))*1.1;
+    if(style==="comet")r=(i/52)*48;
+    g.fillStyle=palette[(style==="rainbow"?i:index)%palette.length];
+    g.globalAlpha=.55+.45*Math.sin(t*1.7+p.phase);
+    g.beginPath();g.arc(w/2+Math.cos(a)*r,h/2+Math.sin(a)*r*.65,style==="glitter"?1.3:2.1,0,6.28);g.fill();
+   });
+   g.globalAlpha=1;
+   requestAnimationFrame(draw);
+  };
+  draw();
+ });
+}
+drawStylePreviews();
 </script>
 </body>
 </html>
