@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -47,7 +48,35 @@ textarea{min-height:75px;resize:vertical}
 .screen-select{display:grid;grid-template-columns:repeat(auto-fit,minmax(75px,1fr));gap:8px}
 .screen-select button{padding:12px 5px}
 .screen-select button.selected{background:#3478f6;outline:2px solid #a8c8ff}
-@media(max-width:600px){header h1{font-size:21px}.panel{padding:13px}main{width:94%}}
+
+/* Update 2.0 – duidelijkere controller */
+header{position:relative;background:linear-gradient(110deg,#101d35,#172b4d 55%,#251d3c);padding:26px 16px}
+header h1{font-size:clamp(21px,3vw,30px);letter-spacing:1.5px}
+header p{font-size:13px;letter-spacing:.5px}
+main{width:min(1320px,96%);margin:22px auto}
+.panel{padding:20px;border-radius:17px;background:linear-gradient(145deg,rgba(21,35,59,.98),rgba(14,24,42,.98));border-color:#304767}
+.panel h2{display:flex;align-items:center;gap:9px;font-size:17px;margin-bottom:17px}
+#previewGrid{grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:13px}
+.preview{border-color:#3a5275;box-shadow:inset 0 0 22px #0005}
+.preview canvas{height:125px}
+.preview-info{background:#0b1528;padding:11px 12px}
+.preview-info b{color:#f1f6ff;font-size:13px}
+.preview-info span{font-weight:bold;letter-spacing:.5px}
+.screen-select{grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.screen-select button{min-height:48px;font-size:12px;padding:9px 5px;border:1px solid #405777;background:#1a2a45}
+.screen-select button.selected{background:linear-gradient(135deg,#3478f6,#5b67e8);border-color:#a8c8ff;box-shadow:0 0 0 2px #3478f655}
+.mode-buttons{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mode-buttons button{min-height:64px;font-size:16px;letter-spacing:.4px}
+#targetStatus{font-weight:bold}
+.status{border:1px solid #2b4264;background:#0b162a}
+button{transition:transform .15s ease,filter .15s ease,box-shadow .15s ease}
+button:hover{transform:translateY(-1px);box-shadow:0 5px 15px #0003}
+button:active{transform:translateY(0)}
+input:focus,select:focus,textarea:focus{outline:2px solid #5794ff;outline-offset:1px;border-color:#5794ff}
+label{font-weight:600;color:#c4d3e8}
+.small{max-width:850px}
+@media(max-width:850px){.screen-select{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:600px){header h1{font-size:21px}.panel{padding:14px}main{width:94%}.screen-select{grid-template-columns:repeat(2,minmax(0,1fr))}.mode-buttons{grid-template-columns:1fr}.mode-buttons button{min-height:52px}#previewGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -71,7 +100,7 @@ textarea{min-height:75px;resize:vertical}
 <main>
 
 <section class="panel">
-<h2>🖥️ Live schermoverzicht</h2>
+<h2>🖥️ Schermoverzicht</h2>
 <div class="grid" id="previewGrid">
 <div class="preview"><canvas id="preview1"></canvas><div class="preview-info"><b>Scherm 1</b><span id="previewStatus1">UIT</span></div></div>
 <div class="preview"><canvas id="preview2"></canvas><div class="preview-info"><b>Scherm 2</b><span id="previewStatus2">UIT</span></div></div>
@@ -79,11 +108,11 @@ textarea{min-height:75px;resize:vertical}
 <div class="preview"><canvas id="preview4"></canvas><div class="preview-info"><b>Scherm 4</b><span id="previewStatus4">UIT</span></div></div>
 <div class="preview"><canvas id="preview5"></canvas><div class="preview-info"><b>Scherm 5</b><span id="previewStatus5">UIT</span></div></div>
 </div>
-<p class="small">De previews tonen een lokale simulatie van de gekozen effecten.</p>
+<p class="small">Voorbeeldweergave van de gekozen modus. Dit is een lokale simulatie, geen live videobeeld van de schermen.</p>
 </section>
 
 <section class="panel">
-<h2>🎯 Selecteer de schermen</h2>
+<h2>🎯 Waar wil je de opdracht uitvoeren?</h2>
 <div class="screen-select">
 <button data-target="1" class="selected">SCHERM 1</button>
 <button data-target="2">SCHERM 2</button>
@@ -97,7 +126,7 @@ textarea{min-height:75px;resize:vertical}
 </section>
 
 <section class="panel">
-<h2>🎛️ Weergavemodus</h2>
+<h2>🎛️ Kies de weergave</h2>
 <div class="grid mode-buttons">
 <button class="snowbtn" id="snowButton">❄ SNEEUW</button>
 <button class="firebtn" id="fireButton">🎆 VUURWERK</button>
@@ -163,7 +192,7 @@ textarea{min-height:75px;resize:vertical}
 </section>
 
 <section class="panel">
-<h2>🖥️ Schermbeheer</h2>
+<h2>🛠️ Schermbeheer en verversen</h2>
 <div class="grid">
 <button data-refresh="1">VERVERS SCHERM 1</button>
 <button data-refresh="2">VERVERS SCHERM 2</button>
@@ -262,7 +291,7 @@ async function sendCommand(action,target=selectedTarget,extra={}){
   return;
  }
  const id=crypto.randomUUID();
- const commandTarget=target==="1+2"?"all":target;
+ const commandTarget=target;
  try{
   await set(ref(db,"show"),{
    action,
@@ -275,20 +304,6 @@ async function sendCommand(action,target=selectedTarget,extra={}){
  }catch(error){
   setStatus("Firebase-fout: "+error.message);
  }
-}
-
-function updatePreview(screenNumber,mode){
- const label=document.getElementById("previewStatus"+screenNumber);
- const canvas=document.getElementById("preview"+screenNumber);
- if(!label||!canvas)return;
- label.textContent=mode==="snow"?"SNEEUW":mode==="fireworks"?"VUURWERK":"UIT";
- canvas.dataset.mode=mode;
-}
-
-function updateAllPreviews(mode,target=selectedTarget){
- targetScreensFor(target).forEach(n=>{
-  updatePreview(n,mode);
- });
 }
 
 function targetScreensFor(target){
@@ -635,12 +650,12 @@ function applyCommand(data){
  if(data.id)lastCommand=data.id;
 
  if(data.action==="refresh"){
-  if(data.target==="all"||Number(data.target)===browser){
+  if(data.target==="all"||Number(data.target)===browser||(data.target==="1+2"&&browser<=2)){
    if(Date.now()-Number(data.updatedAt)<30000)location.reload();
   }
   return;
  }
- if(data.target!=="all"&&Number(data.target)!==browser)return;
+ if(data.target!=="all"&&Number(data.target)!==browser&&!(data.target==="1+2"&&browser<=2))return;
 
  if(data.action==="display-mode"){
   clearEffects();
@@ -728,52 +743,55 @@ if(controller){
  });
 }
 
+const previewLoops = new Map();
 function startPreview(canvas,mode){
+ const old=previewLoops.get(canvas);
+ if(old)old.active=false;
+ const loop={active:true};
+ previewLoops.set(canvas,loop);
  const c=canvas.getContext("2d");
- const w=canvas.width=canvas.clientWidth*2;
- const h=canvas.height=canvas.clientHeight*2;
- let dots=[];
- for(let i=0;i<30;i++)dots.push({x:Math.random()*w,y:Math.random()*h,v:1+Math.random()*2});
+ const w=canvas.width=Math.max(1,canvas.clientWidth*2);
+ const h=canvas.height=Math.max(1,canvas.clientHeight*2);
+ const dots=Array.from({length:38},()=>({x:Math.random()*w,y:Math.random()*h,v:.7+Math.random()*1.8,r:1+Math.random()*2}));
  function draw(){
+  if(!loop.active||canvas.dataset.mode!==mode)return;
   c.fillStyle="#050914";c.fillRect(0,0,w,h);
   if(mode==="snow"){
    c.fillStyle="#e5f5ff";
-   for(const p of dots){
-    p.y+=p.v;
-    if(p.y>h)p.y=0;
-    c.beginPath();c.arc(p.x,p.y,2,0,Math.PI*2);c.fill();
-   }
+   for(const p of dots){p.y+=p.v;if(p.y>h){p.y=-4;p.x=Math.random()*w;}p.x+=Math.sin(p.y*.008)*.25;c.beginPath();c.arc(p.x,p.y,p.r,0,Math.PI*2);c.fill();}
   }else if(mode==="fireworks"){
-   for(let i=0;i<12;i++){
-    const x=Math.random()*w,y=Math.random()*h;
-    c.fillStyle=colors[canvas.dataset.screen-1][i%4];
-    c.globalAlpha=.8;
-    c.beginPath();c.arc(x,y,1+Math.random()*3,0,Math.PI*2);c.fill();
+   for(let i=0;i<15;i++){
+    const x=(i*137+Math.sin(Date.now()*.001+i)*35)%w;
+    const y=(i*71+Math.cos(Date.now()*.0013+i)*25)%(h*.85);
+    c.fillStyle=colors[Number(canvas.dataset.screen)-1][i%4];c.globalAlpha=.45+Math.random()*.5;
+    c.beginPath();c.arc(x,y,1+Math.random()*2.5,0,Math.PI*2);c.fill();
    }
    c.globalAlpha=1;
   }
-  if(canvas.dataset.mode===mode)requestAnimationFrame(draw);
+  requestAnimationFrame(draw);
  }
  draw();
+}
+function updatePreview(number,mode){
+ const label=document.getElementById("previewStatus"+number);
+ const canvas=document.getElementById("preview"+number);
+ if(!label||!canvas)return;
+ label.textContent=mode==="snow"?"SNEEUW":mode==="fireworks"?"VUURWERK":"UIT";
+ canvas.dataset.mode=mode;
+ if(mode!=="off")startPreview(canvas,mode);
+ else{
+  const loop=previewLoops.get(canvas);if(loop)loop.active=false;
+  const c=canvas.getContext("2d");c.clearRect(0,0,canvas.width,canvas.height);
+ }
+}
+function updateAllPreviews(mode,target=selectedTarget){
+ targetScreensFor(target).forEach(n=>updatePreview(n,mode));
 }
 
 for(let n=1;n<=5;n++){
  const c=document.getElementById("preview"+n);
  c.dataset.screen=n;
  c.dataset.mode="off";
- const original=updatePreview;
- updatePreview=function(number,mode){
-  original(number,mode);
-  const target=document.getElementById("preview"+number);
-  if(target){
-   target.dataset.mode=mode;
-   if(mode!=="off")startPreview(target,mode);
-   else{
-    const x=target.getContext("2d");
-    x.clearRect(0,0,target.width,target.height);
-   }
-  }
- };
 }
 </script>
 </body>
