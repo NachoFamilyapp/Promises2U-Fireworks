@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -39,7 +40,9 @@ textarea{min-height:75px;resize:vertical}
 .status{padding:11px;background:#091326;border-radius:8px;color:#b8d4ff;margin-top:12px;overflow-wrap:anywhere}
 .small{font-size:12px;color:var(--muted);line-height:1.5}
 #screen{position:fixed;inset:0;background:#080817;overflow:hidden}
-#fireworks{position:absolute;inset:0;width:100%;height:100%}
+#wallpaper{position:absolute;inset:0;background:#080817 center/cover no-repeat;display:none}
+#fireworks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#traveler{position:absolute;z-index:3;left:0;top:68%;font-size:clamp(34px,6vw,76px);filter:drop-shadow(0 3px 8px #000);display:none;pointer-events:none;will-change:transform}
 .screen-label{position:absolute;top:18px;left:0;right:0;text-align:center;color:#ffffff80;font-size:12px;letter-spacing:3px;pointer-events:none}
 #login{max-width:420px;margin:50px auto}
 #controller{padding-bottom:40px}
@@ -77,148 +80,156 @@ textarea{min-height:75px;resize:vertical}
 <main>
 
 <section class="panel">
-<h2>🖥️ Live schermoverzicht</h2>
-<div class="grid" id="previewGrid">
-<div class="preview"><canvas id="preview1"></canvas><div class="preview-info"><b>Scherm 1</b><span id="previewStatus1">UIT</span></div></div>
-<div class="preview"><canvas id="preview2"></canvas><div class="preview-info"><b>Scherm 2</b><span id="previewStatus2">UIT</span></div></div>
-<div class="preview"><canvas id="preview3"></canvas><div class="preview-info"><b>Scherm 3</b><span id="previewStatus3">UIT</span></div></div>
-<div class="preview"><canvas id="preview4"></canvas><div class="preview-info"><b>Scherm 4</b><span id="previewStatus4">UIT</span></div></div>
-<div class="preview"><canvas id="preview5"></canvas><div class="preview-info"><b>Scherm 5</b><span id="previewStatus5">UIT</span></div></div>
-</div>
-<p class="small">De previews tonen een lokale simulatie van de gekozen effecten.</p>
-</section>
-
-<section class="panel">
-<h2>🎯 Selecteer de schermen</h2>
-<div class="screen-select">
-<button data-target="1" class="selected">SCHERM 1</button>
-<button data-target="2">SCHERM 2</button>
-<button data-target="3">SCHERM 3</button>
-<button data-target="4">SCHERM 4</button>
-<button data-target="5">SCHERM 5</button>
+<h2>🎮 Controller</h2>
+<p class="small">Selecteer de schermen waarop je de effecten wilt uitvoeren.</p>
+<div class="screen-select" id="screenTargets">
+<button data-target="1" class="selected">Scherm 1</button>
+<button data-target="2">Scherm 2</button>
+<button data-target="3">Scherm 3</button>
+<button data-target="4">Scherm 4</button>
+<button data-target="5">Scherm 5</button>
 <button data-target="1+2">1 + 2</button>
-<button data-target="all">ALLE 5</button>
+<button data-target="all">Alle schermen</button>
 </div>
-<div class="status" id="targetStatus">Geselecteerd: Scherm 1</div>
+<div class="status" id="controllerStatus">Verbonden met Firebase.</div>
 </section>
 
 <section class="panel">
-<h2>🎛️ Weergavemodus</h2>
+<h2>🎆 Vuurwerkbesturing</h2>
 <div class="grid mode-buttons">
-<button class="snowbtn" id="snowButton">❄ SNEEUW</button>
-<button class="firebtn" id="fireButton">🎆 VUURWERK</button>
-<button class="stopbtn" id="stopButton">■ STOP</button>
+<button class="firebtn" id="startFireworks">🎆 START VUURWERK</button>
+<button class="stopbtn" id="stopShow">⏹ STOP</button>
+<button id="pauseShow">⏸ PAUZE</button>
+<button id="resumeShow">▶ HERVAT</button>
 </div>
-<p class="small">Een nieuwe modus stopt eerst de vorige modus op de geselecteerde schermen.</p>
-</section>
-
-<section class="panel">
-<h2>🎆 Vuurwerkinstellingen</h2>
-<label>Vuurwerkintensiteit: <output id="fireOut">65%</output></label>
-<input id="fireIntensity" type="range" min="10" max="100" value="65">
-<label>Explosiegrootte</label>
+<label>Vuurwerkintensiteit: <strong id="fireIntensityValue">65%</strong></label>
+<input type="range" id="fireIntensity" min="10" max="100" value="65">
+<label>Formaat vuurwerk</label>
 <select id="burstSize">
 <option value="normal">Normaal</option>
-<option value="large" selected>Groot</option>
+<option value="large">Groot</option>
 <option value="mega">Mega</option>
 </select>
-<label>Vuurwerkstijl</label>
-<select id="shellType" class="hidden">
+<label>Vuurwerktype</label>
+<select id="shellType">
 <option value="random">Willekeurig</option>
-<option value="chrysanthemum">Chrysanthemum</option>
-<option value="peony">Peony</option>
-<option value="palm">Palm</option>
-<option value="willow">Golden Willow</option>
-<option value="crossette">Crossette</option>
-<option value="kamuro">Kamuro</option>
+<option value="classic">Classic</option>
 <option value="ring">Ring</option>
-<option value="heart">Heart</option>
-<option value="star">Star</option>
+<option value="heart">Hart</option>
+<option value="star">Ster</option>
+<option value="willow">Willow</option>
 <option value="comet">Comet</option>
 <option value="glitter">Glitter</option>
-<option value="rainbow">Rainbow</option>
+<option value="rainbow">Regenboog</option>
+<option value="chrysanthemum">Chrysanthemum</option>
+<option value="palm">Palm</option>
+<option value="crossette">Crossette</option>
+<option value="kamuro">Kamuro</option>
 </select>
-<div class="style-grid" id="styleGrid">
-<button type="button" class="style-card selected" data-style="chrysanthemum"><canvas id="stylePreview-chrysanthemum"></canvas><b>Chrysanthemum</b><small>Grote gouden bloemexplosie</small></button>
-<button type="button" class="style-card" data-style="peony"><canvas id="stylePreview-peony"></canvas><b>Peony</b><small>Ronde kleurrijke explosie</small></button>
-<button type="button" class="style-card" data-style="palm"><canvas id="stylePreview-palm"></canvas><b>Palm</b><small>Lange gouden lichttakken</small></button>
-<button type="button" class="style-card" data-style="willow"><canvas id="stylePreview-willow"></canvas><b>Golden Willow</b><small>Hangende gouden vonken</small></button>
-<button type="button" class="style-card" data-style="crossette"><canvas id="stylePreview-crossette"></canvas><b>Crossette</b><small>Vonk splitst in kleinere sterren</small></button>
-<button type="button" class="style-card" data-style="kamuro"><canvas id="stylePreview-kamuro"></canvas><b>Kamuro</b><small>Brede gouden waterval</small></button>
-<button type="button" class="style-card" data-style="ring"><canvas id="stylePreview-ring"></canvas><b>Ring</b><small>Perfecte cirkel</small></button>
-<button type="button" class="style-card" data-style="heart"><canvas id="stylePreview-heart"></canvas><b>Heart</b><small>Hartvormige explosie</small></button>
-<button type="button" class="style-card" data-style="star"><canvas id="stylePreview-star"></canvas><b>Star</b><small>Stervormige explosie</small></button>
-<button type="button" class="style-card" data-style="comet"><canvas id="stylePreview-comet"></canvas><b>Comet</b><small>Lichtspoor met felle kop</small></button>
-<button type="button" class="style-card" data-style="glitter"><canvas id="stylePreview-glitter"></canvas><b>Glitter</b><small>Fijne sprankelende vonken</small></button>
-<button type="button" class="style-card" data-style="rainbow"><canvas id="stylePreview-rainbow"></canvas><b>Rainbow</b><small>Alle kleuren van de regenboog</small></button>
-</div>
-<p class="small" id="styleStatus">Geselecteerd: Chrysanthemum</p>
-<button id="saveFireSettings" class="goldbtn" style="width:100%;margin-top:13px">INSTELLINGEN TOEPASSEN</button>
+<button id="applyFireSettings" class="primary" style="margin-top:12px;width:100%">INSTELLINGEN TOEPASSEN</button>
 </section>
 
 <section class="panel">
-<h2>❄️ Sneeuwinstellingen</h2>
-<label>Sneeuwintensiteit: <output id="snowOut">55%</output></label>
-<input id="snowIntensity" type="range" min="10" max="100" value="55">
-<button id="saveSnowSettings" class="snowbtn" style="width:100%;margin-top:13px">SNEEUWINTENSITEIT TOEPASSEN</button>
-</section>
-
-<section class="panel">
-<h2>✨ Sky Projection</h2>
-<p class="small">Toon tekst of een afbeelding en laat deze veranderen in lichtdeeltjes.</p>
-<label>Tekstprojectie</label>
-<textarea id="projectionText" maxlength="90" placeholder="Bijvoorbeeld: HAPPY BIRTHDAY!"></textarea>
-<label>Afbeelding</label>
-<input id="projectionImage" type="file" accept="image/png,image/jpeg,image/webp">
-<label>Projectieduur</label>
-<select id="projectionDuration">
-<option value="2500">2,5 seconden</option>
-<option value="4000" selected>4 seconden</option>
-<option value="6000">6 seconden</option>
-</select>
-<label>Verschijning</label>
-<select id="projectionMode">
-<option value="both">Projectie + explosie</option>
-<option value="project">Alleen projectie</option>
-<option value="particles">Direct deeltjes</option>
-</select>
-<button id="sendProjection" class="goldbtn" style="width:100%;margin-top:12px">✨ PROJECTIE VERZENDEN</button>
-<button id="clearProjection" style="width:100%;margin-top:8px">PROJECTIE WISSEN</button>
-<p class="small">Gebruik afbeeldingen tot maximaal 700 KB.</p>
-</section>
-
-<section class="panel">
-<h2>🖥️ Schermbeheer</h2>
+<h2>❄️ Sneeuwbesturing</h2>
 <div class="grid">
-<button data-refresh="1">VERVERS SCHERM 1</button>
-<button data-refresh="2">VERVERS SCHERM 2</button>
-<button data-refresh="3">VERVERS SCHERM 3</button>
-<button data-refresh="4">VERVERS SCHERM 4</button>
-<button data-refresh="5">VERVERS SCHERM 5</button>
+<button id="snowOn" class="snowbtn">❄️ SNEEUW AAN</button>
+<button id="snowOff" class="stopbtn">SNEEUW UIT</button>
 </div>
-<button id="refreshAll" class="stopbtn" style="width:100%;margin-top:12px">ALLE VIJF SCHERMEN VERVERSEN</button>
+<label>Sneeuwintensiteit: <strong id="snowIntensityValue">50%</strong></label>
+<input type="range" id="snowIntensity" min="10" max="100" value="50">
+<button id="applySnowIntensity" class="primary" style="margin-top:12px;width:100%">SNEEUWINTENSITEIT TOEPASSEN</button>
 </section>
 
-<div class="status" id="status">Controller gereed.</div>
-<button id="logoutButton" style="width:100%;margin-top:12px">UITLOGGEN</button>
+<section class="panel">
+<h2>🖼️ Projectie</h2>
+<label>Tekst op het scherm</label>
+<textarea id="projectionText" placeholder="Typ hier de tekst die je wilt projecteren"></textarea>
+<label>Afbeeldings-URL</label>
+<input id="projectionImage" type="url" placeholder="https://...">
+<label>Weergaveduur in seconden</label>
+<input id="projectionDuration" type="number" min="1" max="300" value="15">
+<label>Weergavemodus</label>
+<select id="projectionMode">
+<option value="both">Tekst en effecten</option>
+<option value="project">Alleen projectie</option>
+<option value="particles">Projectie met effecten</option>
+</select>
+<div class="row" style="margin-top:12px">
+<button id="showProjection" class="primary">PROJECTIE TONEN</button>
+<button id="clearProjection" class="stopbtn">PROJECTIE WISSEN</button>
+</div>
+</section>
+
+<section class="panel">
+<h2>🎄 Kerstlandschap voor scherm 1 en 2</h2>
+<p class="small">Scherm 1 toont de linkerhelft en scherm 2 de rechterhelft. Schermen 3, 4 en 5 behouden hun effectenscherm zonder achtergrond.</p>
+<label>Kies het landschap</label>
+<select id="wallpaperStyle">
+<option value="winterbos">Winterbos</option>
+<option value="alpendorp">Alpendorp</option>
+<option value="frozen-lake">Bevroren meer</option>
+<option value="moonlight">Moonlight</option>
+</select>
+<button id="applyWallpaper" class="primary" style="width:100%;margin-top:12px">ACHTERGROND TOEPASSEN</button>
+<div class="small" style="margin-top:10px">Zorg dat de map backgrounds naast index.html staat.</div>
+<div class="divider"></div>
+<h3>🎅 Kerstman over de twee schermen</h3>
+<p class="small">Start de Kerstman op scherm 1. De animatie loopt daarna door naar scherm 2.</p>
+<div class="row">
+<button id="startSanta" class="goldbtn">🎅 START KERSTMAN</button>
+<button id="stopSanta" class="stopbtn">STOP KERSTMAN</button>
+</div>
+</section>
+
+<section class="panel">
+<h2>🔄 Schermbeheer</h2>
+<button id="refreshScreens" class="primary" style="width:100%">VERVERS GESELECTEERDE SCHERMEN</button>
+<p class="small">De geselecteerde schermen ontvangen een verversopdracht.</p>
+</section>
+
+<section class="panel">
+<h2>📺 Live schermvoorbeelden</h2>
+<div class="grid">
+<div class="preview"><canvas id="preview1"></canvas><div class="preview-info"><span>Scherm 1</span><span id="previewStatus1">Uit</span></div></div>
+<div class="preview"><canvas id="preview2"></canvas><div class="preview-info"><span>Scherm 2</span><span id="previewStatus2">Uit</span></div></div>
+<div class="preview"><canvas id="preview3"></canvas><div class="preview-info"><span>Scherm 3</span><span id="previewStatus3">Uit</span></div></div>
+<div class="preview"><canvas id="preview4"></canvas><div class="preview-info"><span>Scherm 4</span><span id="previewStatus4">Uit</span></div></div>
+<div class="preview"><canvas id="preview5"></canvas><div class="preview-info"><span>Scherm 5</span><span id="previewStatus5">Uit</span></div></div>
+</div>
+</section>
+
+<section class="panel">
+<h2>✨ Vuurwerkstijlen</h2>
+<div class="style-grid" id="styleGrid">
+<div class="style-card"><canvas id="stylePreview-chrysanthemum"></canvas><b>Chrysanthemum</b><small>Grote ronde bloemexplosie</small></div>
+<div class="style-card"><canvas id="stylePreview-peony"></canvas><b>Peony</b><small>Ronde gekleurde explosie</small></div>
+<div class="style-card"><canvas id="stylePreview-palm"></canvas><b>Palm</b><small>Lange vallende lichtsporen</small></div>
+<div class="style-card"><canvas id="stylePreview-willow"></canvas><b>Willow</b><small>Gouden treurwilg-effect</small></div>
+<div class="style-card"><canvas id="stylePreview-crossette"></canvas><b>Crossette</b><small>Opsplitsende lichtstralen</small></div>
+<div class="style-card"><canvas id="stylePreview-kamuro"></canvas><b>Kamuro</b><small>Gouden brede fontein</small></div>
+<div class="style-card"><canvas id="stylePreview-ring"></canvas><b>Ring</b><small>Perfecte lichtcirkel</small></div>
+<div class="style-card"><canvas id="stylePreview-heart"></canvas><b>Heart</b><small>Hartvormige explosie</small></div>
+<div class="style-card"><canvas id="stylePreview-star"></canvas><b>Star</b><small>Stervormige explosie</small></div>
+<div class="style-card"><canvas id="stylePreview-comet"></canvas><b>Comet</b><small>Lichtsporen en staarten</small></div>
+<div class="style-card"><canvas id="stylePreview-glitter"></canvas><b>Glitter</b><small>Fijne fonkelende lichtjes</small></div>
+<div class="style-card"><canvas id="stylePreview-rainbow"></canvas><b>Rainbow</b><small>Meerdere regenboogkleuren</small></div>
+</div>
+</section>
 
 </main>
 </div>
 
 <div id="screen" class="hidden">
+<div id="wallpaper"></div>
+<div id="traveler">🎅</div>
 <canvas id="fireworks"></canvas>
-<div class="screen-label" id="number"></div>
+<div class="screen-label" id="screenLabel"></div>
 </div>
 
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {
- getAuth,signInWithEmailAndPassword,signInAnonymously,
- onAuthStateChanged,signOut
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {
- getDatabase,ref,set,onValue
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig={
  apiKey:"AIzaSyCeSW4dzzMZStmrI9FngSKC6HXNi51Doh0",
@@ -235,584 +246,425 @@ const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getDatabase(app);
 const params=new URLSearchParams(location.search);
-const controller=params.has("controller");
-const browser=Math.min(5,Math.max(1,Number(params.get("browser"))||1));
-
+const browserNumber=Number(params.get("browser")||0);
+const isScreen=browserNumber>=1&&browserNumber<=5;
+const isController=params.get("controller")==="1";
 const login=document.getElementById("login");
-const control=document.getElementById("controller");
+const controller=document.getElementById("controller");
 const screen=document.getElementById("screen");
+const canvas=document.getElementById("fireworks");
+const ctx=canvas.getContext("2d");
+const wallpaper=document.getElementById("wallpaper");
+const traveler=document.getElementById("traveler");
 
 let selectedTarget="1";
-let currentMode="off";
+let connected=false;
+let currentAction="off";
+let currentDisplayMode="off";
 let fireIntensity=65;
-let snowIntensity=55;
-let burstSize="large";
-let shellType="random";
-let lastCommand="";
-let lastProjection="";
+let snowIntensity=50;
+let particles=[];
+let snowflakes=[];
+let animationFrame=0;
+let santaStartAt=0;
+let wallpaperStyle="winterbos";
+let lastCommandId="";
+let screenSettings={};
 
-if(controller){
- control.classList.remove("hidden");
- screen.classList.add("hidden");
-}else{
- screen.classList.remove("hidden");
- control.classList.add("hidden");
- login.classList.add("hidden");
- document.getElementById("number").textContent="PROMISES2U FIREWORKS · SCHERM "+browser;
-}
+const wallpaperFiles={
+ winterbos:["backgrounds/winterbos-left.jpg","backgrounds/winterbos-right.jpg"],
+ alpendorp:["backgrounds/alpendorp-left.jpg","backgrounds/alpendorp-right.jpg"],
+ "frozen-lake":["backgrounds/frozen-lake-left.jpg","backgrounds/frozen-lake-right.jpg"],
+ moonlight:["backgrounds/moonlight-left.jpg","backgrounds/moonlight-right.jpg"]
+};
 
 function setStatus(message){
- const el=document.getElementById("status");
+ const el=document.getElementById("controllerStatus");
  if(el)el.textContent=message;
 }
 
-function targetScreens(){
- if(selectedTarget==="all")return [1,2,3,4,5];
- if(selectedTarget==="1+2")return [1,2];
- return [Number(selectedTarget)];
+function resizeCanvas(){
+ if(!canvas)return;
+ const dpr=Math.min(devicePixelRatio||1,2);
+ canvas.width=Math.floor(innerWidth*dpr);
+ canvas.height=Math.floor(innerHeight*dpr);
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+addEventListener("resize",resizeCanvas);
+resizeCanvas();
+
+function applyWallpaper(style){
+ if(!isScreen||browserNumber>2)return;
+ const pair=wallpaperFiles[style]||wallpaperFiles.winterbos;
+ const file=pair[browserNumber-1];
+ wallpaper.style.backgroundImage=`url("${file}")`;
+ wallpaper.style.display="block";
+ wallpaperStyle=style;
 }
 
-document.querySelectorAll("[data-target]").forEach(button=>{
- button.addEventListener("click",()=>{
-  selectedTarget=button.dataset.target;
-  document.querySelectorAll("[data-target]").forEach(b=>b.classList.remove("selected"));
-  button.classList.add("selected");
-  document.getElementById("targetStatus").textContent="Geselecteerd: "+(selectedTarget==="all"?"Alle vijf schermen":selectedTarget==="1+2"?"Scherm 1 en 2":"Scherm "+selectedTarget);
- });
-});
-
-async function sendCommand(action,target=selectedTarget,extra={}){
- if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID){
-  setStatus("Geen beheerrechten. Log opnieuw in.");
+function animateSanta(){
+ if(!isScreen||browserNumber>2||!santaStartAt){
+  if(traveler)traveler.style.display="none";
   return;
  }
- const id=crypto.randomUUID();
- const commandTarget=target;
- try{
-  await set(ref(db,"show"),{
-   action,
-   target:commandTarget,
-   id,
-   updatedAt:Date.now(),
-   ...extra
-  });
-  setStatus("Verzonden: "+action+" · "+target);
- }catch(error){
-  setStatus("Firebase-fout: "+error.message);
+ const elapsed=(Date.now()-santaStartAt)%24000;
+ if(elapsed<0){traveler.style.display="none";return;}
+ const segment=elapsed<12000?1:2;
+ if(browserNumber!==segment){
+  traveler.style.display="none";
+  return;
  }
+ const localTime=segment===1?elapsed:elapsed-12000;
+ const progress=localTime/12000;
+ traveler.style.display="block";
+ traveler.style.transform=`translateX(${progress*(innerWidth+100)-70}px)`;
+ traveler.style.top=`${68+Math.sin(progress*Math.PI*4)*2}%`;
 }
 
-function updateAllPreviews(mode,target=selectedTarget){
- targetScreensFor(target).forEach(n=>{
-  updatePreview(n,mode);
- });
+function startSantaAnimation(){
+ if(!isScreen||browserNumber>2)return;
+ setInterval(animateSanta,50);
 }
 
-function targetScreensFor(target){
- if(target==="all")return [1,2,3,4,5];
- if(target==="1+2")return [1,2];
- return [Number(target)];
-}
-
-function setMode(mode){
- currentMode=mode;
- updateAllPreviews(mode);
- sendCommand("display-mode",selectedTarget,{displayMode:mode});
-}
-
-document.getElementById("snowButton").addEventListener("click",()=>{
- setMode("snow");
-});
-
-document.getElementById("fireButton").addEventListener("click",()=>{
- setMode("fireworks");
-});
-
-document.getElementById("stopButton").addEventListener("click",()=>{
- setMode("off");
-});
-
-document.getElementById("fireIntensity").addEventListener("input",e=>{
- document.getElementById("fireOut").value=e.target.value+"%";
- fireIntensity=Number(e.target.value);
-});
-
-document.getElementById("snowIntensity").addEventListener("input",e=>{
- document.getElementById("snowOut").value=e.target.value+"%";
- snowIntensity=Number(e.target.value);
-});
-
-const styleNames={chrysanthemum:"Chrysanthemum",peony:"Peony",palm:"Palm",willow:"Golden Willow",crossette:"Crossette",kamuro:"Kamuro",ring:"Ring",heart:"Heart",star:"Star",comet:"Comet",glitter:"Glitter",rainbow:"Rainbow"};
-document.querySelectorAll("[data-style]").forEach(button=>{
- button.addEventListener("click",()=>{
-  shellType=button.dataset.style;
-  document.getElementById("shellType").value=shellType;
-  document.querySelectorAll("[data-style]").forEach(card=>card.classList.toggle("selected",card===button));
-  document.getElementById("styleStatus").textContent="Geselecteerd: "+styleNames[shellType];
- });
-});
-document.getElementById("saveFireSettings").addEventListener("click",()=>{
- burstSize=document.getElementById("burstSize").value;
- shellType=document.getElementById("shellType").value;
- sendCommand("settings",selectedTarget,{
-  fireIntensity,burstSize,shellType
- });
-});
-
-document.getElementById("saveSnowSettings").addEventListener("click",async()=>{
- try{
-  await set(ref(db,"settings/snowIntensity"),snowIntensity);
-  setStatus("Sneeuwintensiteit opgeslagen.");
- }catch(e){
-  setStatus("Firebase-fout: "+e.message);
- }
-});
-
-async function imageAsData(file){
- if(file.size>700*1024)throw new Error("Afbeelding is groter dan 700 KB.");
- return new Promise((resolve,reject)=>{
-  const reader=new FileReader();
-  reader.onload=()=>resolve(reader.result);
-  reader.onerror=reject;
-  reader.readAsDataURL(file);
- });
-}
-
-document.getElementById("sendProjection").addEventListener("click",async()=>{
- try{
-  const text=document.getElementById("projectionText").value.trim();
-  const file=document.getElementById("projectionImage").files[0];
-  const image=file?await imageAsData(file):"";
-  if(!text&&!image){
-   setStatus("Vul tekst in of kies een afbeelding.");
-   return;
-  }
-  await sendCommand("projection",selectedTarget,{
-   text,image,
-   duration:Number(document.getElementById("projectionDuration").value),
-   mode:document.getElementById("projectionMode").value
-  });
- }catch(e){
-  setStatus(e.message);
- }
-});
-
-document.getElementById("clearProjection").addEventListener("click",()=>{
- sendCommand("clear-projection","all");
-});
-
-document.querySelectorAll("[data-refresh]").forEach(button=>{
- button.addEventListener("click",()=>{
-  sendCommand("refresh",button.dataset.refresh);
- });
-});
-
-document.getElementById("refreshAll").addEventListener("click",()=>{
- if(confirm("Weet je zeker dat je alle vijf schermen wilt verversen?")){
-  sendCommand("refresh","all");
- }
-});
-
-document.getElementById("logoutButton").addEventListener("click",async()=>{
- await signOut(auth);
-});
-
-document.getElementById("loginButton").addEventListener("click",async()=>{
- const email=document.getElementById("email").value.trim();
- const password=document.getElementById("password").value;
- const message=document.getElementById("loginStatus");
- try{
-  message.textContent="Bezig met inloggen...";
-  const result=await signInWithEmailAndPassword(auth,email,password);
-  if(result.user.uid!==ADMIN_UID){
-   await signOut(auth);
-   message.textContent="Dit account heeft geen beheerrechten.";
-  }
- }catch(e){
-  message.textContent="Inloggen mislukt: "+e.message;
- }
-});
-
-onAuthStateChanged(auth,async user=>{
- if(controller){
-  const allowed=!!user&&user.uid===ADMIN_UID;
-  login.classList.toggle("hidden",allowed);
-  control.classList.toggle("hidden",!allowed);
-  if(user&&!allowed)await signOut(auth);
- }else{
-  if(!user){
-   try{await signInAnonymously(auth);}
-   catch(e){console.error("Firebase login:",e);}
-  }
- }
-});
-
-const canvas=document.getElementById("fireworks");
-const ctx=canvas.getContext("2d");
-let W=0,H=0;
-let rockets=[],particles=[],snowflakes=[];
-let fireworksRunning=false,snowRunning=false,projectionRunning=false;
-let projectionParticles=[];
-let animationStarted=false;
-
-function resize(){
- const d=window.devicePixelRatio||1;
- canvas.width=innerWidth*d;
- canvas.height=innerHeight*d;
- ctx.setTransform(d,0,0,d,0,0);
- W=innerWidth;H=innerHeight;
- if(snowRunning)createSnow();
-}
-addEventListener("resize",resize);
-resize();
-
-const colors=[
- ["#ffd166","#ffb703","#fff1a8","#fff"],
- ["#70d6ff","#b388ff","#f15bb5","#fff"],
- ["#ff595e","#ffca3a","#fff","#ff924c"],
- ["#80ed99","#57cc99","#caffbf","#fff"],
- ["#ff70a6","#ffd670","#70d6ff","#fff"]
-];
-
-function clearEffects(){
- fireworksRunning=false;
- snowRunning=false;
- projectionRunning=false;
- rockets=[];
+function resizeAndClear(){
+ resizeCanvas();
  particles=[];
- projectionParticles=[];
  snowflakes=[];
- ctx.clearRect(0,0,W,H);
+ ctx.clearRect(0,0,innerWidth,innerHeight);
 }
 
-function createSnow(){
- snowflakes=[];
- const amount=Math.max(35,Math.min(650,Math.round((W*H/6500)*(snowIntensity/55))));
- for(let i=0;i<amount;i++){
-  snowflakes.push({
-   x:Math.random()*W,y:Math.random()*H,
-   r:(.7+Math.random()*2.8)*(0.8+snowIntensity/180),
-   speed:(.45+Math.random()*1.5)*(0.7+snowIntensity/130),
-   drift:Math.random()*.8+.2,
-   phase:Math.random()*Math.PI*2
-  });
+function random(min,max){return Math.random()*(max-min)+min;}
+
+function makeBurst(x,y,type,size){
+ const count=size==="mega"?190:size==="large"?125:75;
+ const palette=type==="rainbow"?["#ff3838","#ff9f0a","#ffd60a","#32d74b","#64d2ff","#0a84ff","#bf5af2"]:["#ffd166","#ffb703","#fff1a8","#ffffff","#ff8c42"];
+ for(let i=0;i<count;i++){
+  let angle=Math.PI*2*i/count;
+  let speed=random(1.5,5.5)*(size==="mega"?1.35:1);
+  if(type==="ring")speed=3.1;
+  if(type==="star")speed=i%2?2.1:5.1;
+  if(type==="heart"){
+   const t=angle;
+   const hx=16*Math.pow(Math.sin(t),3);
+   const hy=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+   particles.push({x:x+hx*2,y:y+hy*2,vx:0,vy:0,life:100,age:0,color:palette[i%palette.length],size:2.4,offset:true,ox:hx*2,oy:hy*2});
+   continue;
+  }
+  if(type==="comet")speed=random(3.5,7);
+  if(type==="willow"||type==="kamuro")speed*=.8;
+  if(type==="crossette")speed*=i%4===0?1.8:1;
+  particles.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:random(65,115),age:0,color:palette[i%palette.length],size:type==="glitter"?1.4:2.1,gravity:type==="palm"||type==="willow"||type==="kamuro"?.055:.025});
  }
 }
 
-function drawSnow(){
- for(const f of snowflakes){
-  f.phase+=.012;
-  f.y+=f.speed;
-  f.x+=Math.sin(f.phase)*f.drift;
-  if(f.y>H+8){f.y=-8;f.x=Math.random()*W;}
+function launchRandomBurst(){
+ if(currentAction!=="start"&&currentDisplayMode!=="fireworks")return;
+ const type=document.getElementById("shellType")?.value||"random";
+ const size=document.getElementById("burstSize")?.value||"normal";
+ const styles=["classic","ring","heart","star","willow","comet","glitter","rainbow","chrysanthemum","palm","crossette","kamuro"];
+ const chosen=type==="random"?styles[Math.floor(Math.random()*styles.length)]:type;
+ makeBurst(random(innerWidth*.12,innerWidth*.88),random(innerHeight*.12,innerHeight*.52),chosen,size);
+}
+
+function drawFireworks(){
+ if(!isScreen)return;
+ ctx.clearRect(0,0,innerWidth,innerHeight);
+ if(currentAction==="start"||currentDisplayMode==="fireworks"){
+  if(Math.random()<fireIntensity/500)launchRandomBurst();
+ }
+ particles=particles.filter(p=>p.age<p.life);
+ for(const p of particles){
+  p.age++;
+  if(p.offset){
+   const alpha=1-p.age/p.life;
+   ctx.globalAlpha=alpha;
+   ctx.fillStyle=p.color;
+   ctx.beginPath();
+   ctx.arc(p.x+p.ox,p.y+p.oy,p.size,0,Math.PI*2);
+   ctx.fill();
+   continue;
+  }
+  p.x+=p.vx;p.y+=p.vy;
+  p.vy+=(p.gravity||.025);
+  p.vx*=.992;p.vy*=.992;
+  ctx.globalAlpha=Math.max(0,1-p.age/p.life);
+  ctx.fillStyle=p.color;
   ctx.beginPath();
-  ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
-  ctx.fillStyle="#e7f6ff";
-  ctx.globalAlpha=.5+Math.random()*.4;
-  ctx.shadowBlur=8;
-  ctx.shadowColor="#b8e9ff";
+  ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
   ctx.fill();
  }
  ctx.globalAlpha=1;
- ctx.shadowBlur=0;
-}
-
-function burst(x,y,palette,type){
- const scale=burstSize==="mega"?2.2:burstSize==="large"?1.5:1;
- const count=Math.round((80+Math.random()*65)*scale*(fireIntensity/65));
- for(let i=0;i<count;i++){
-  let a=Math.random()*Math.PI*2;
-  let speed=(1.2+Math.random()*5.5)*scale;
-  if(type==="ring")speed=3.5*scale;
-  if(type==="palm")speed=(2.0+Math.random()*3.0)*scale;
-  if(type==="willow"||type==="kamuro")speed=(1.0+Math.random()*4.2)*scale;
-  if(type==="glitter")speed=(.7+Math.random()*3.4)*scale;
-  if(type==="crossette")speed=(1.4+Math.random()*5.0)*scale;
-  if(type==="star"){
-   const points=5,sector=Math.PI*2/points;
-   const slot=Math.floor(Math.random()*points);
-   a=slot*sector+(Math.random()-.5)*.28;
-   speed=3.8*scale;
+ if(currentDisplayMode==="snow"||currentAction==="snow-on"){
+  const amount=Math.floor(snowIntensity*1.5);
+  while(snowflakes.length<amount){
+   snowflakes.push({x:random(0,innerWidth),y:random(-innerHeight,0),r:random(1,4),v:random(.6,2.5),drift:random(-.5,.5)});
   }
-  if(type==="heart"){
-   const t=a;
-   const hx=16*Math.pow(Math.sin(t),3);
-   const hy=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
-   a=Math.atan2(hy,hx);
-   speed=3*scale;
-  }
-  particles.push({
-   x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,
-   life:1,decay:(type==="willow"||type==="kamuro"?.005:.008)+Math.random()*.012,
-   color:palette[Math.floor(Math.random()*palette.length)],
-   size:1+Math.random()*2.5,gravity:.04
+  snowflakes.forEach(f=>{
+   f.y+=f.v;f.x+=f.drift;
+   if(f.y>innerHeight){f.y=-5;f.x=random(0,innerWidth);}
+   ctx.fillStyle="#ffffff";
+   ctx.globalAlpha=.7;
+   ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();
   });
+ }else{snowflakes=[];}
+ ctx.globalAlpha=1;
+ animationFrame=requestAnimationFrame(drawFireworks);
+}
+
+function startAnimation(){
+ if(animationFrame)cancelAnimationFrame(animationFrame);
+ if(isScreen)drawFireworks();
+}
+
+function updateScreenStatus(action){
+ currentAction=action||"off";
+ if(action==="start")currentDisplayMode="fireworks";
+ if(action==="snow-on")currentDisplayMode="snow";
+ if(action==="snow-off"||action==="stop")currentDisplayMode="off";
+ if(action==="pause")currentDisplayMode="off";
+ if(action==="resume")currentDisplayMode="fireworks";
+ startAnimation();
+}
+
+async function sendCommand(action,extra={}){
+ if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID){
+  setStatus("Geen beheerdersrechten. Log opnieuw in.");
+  return;
  }
-}
-
-function launch(){
- const palette=shellType==="rainbow"
- ?["#ff3b30","#ff9500","#ffcc00","#34c759","#00c7be","#007aff","#bf5af2"]
- :colors[browser-1];
- const types=["chrysanthemum","peony","palm","willow","crossette","kamuro","ring","heart","star","comet","glitter","rainbow"];
- const type=shellType==="random"?types[Math.floor(Math.random()*types.length)]:shellType;
- rockets.push({
-  x:W*(.12+Math.random()*.76),y:H+5,
-  target:H*(.13+Math.random()*.55),
-  speed:4+Math.random()*3,
-  color:palette[Math.floor(Math.random()*palette.length)],
-  palette,type
- });
-}
-
-function startProjection(data){
- clearEffects();
- if(browser>2)return;
- projectionRunning=true;
- const img=new Image();
-
- const render=()=>{
-  const off=document.createElement("canvas");
-  off.width=220;off.height=130;
-  const o=off.getContext("2d");
-  if(data.image){
-   o.drawImage(img,0,0,220,130);
-  }else{
-   o.fillStyle="white";
-   o.font="bold 30px Arial";
-   o.textAlign="center";
-   o.textBaseline="middle";
-   o.fillText(data.text||"",110,65,210);
-  }
-  const pixels=o.getImageData(0,0,220,130).data;
-  const scale=Math.min(W*.82/220,H*.65/130);
-  const ox=(W-220*scale)/2,oy=(H-130*scale)/2;
-  projectionParticles=[];
-  for(let y=0;y<130;y+=2){
-   for(let x=0;x<220;x+=2){
-    const k=(y*220+x)*4;
-    if(pixels[k+3]>90){
-     projectionParticles.push({
-      x:ox+x*scale,y:oy+y*scale,
-      color:`rgb(${pixels[k]},${pixels[k+1]},${pixels[k+2]})`
-     });
-    }
-   }
-  }
-  const start=Date.now(),duration=Number(data.duration)||4000;
-  function reveal(){
-   if(!projectionRunning)return;
-   const progress=Math.min(1,(Date.now()-start)/duration);
-   ctx.fillStyle="rgba(8,8,23,.25)";
-   ctx.fillRect(0,0,W,H);
-   for(const p of projectionParticles){
-    ctx.globalAlpha=.25+.75*progress;
-    ctx.fillStyle=p.color;
-    ctx.fillRect(p.x,p.y,3,3);
-   }
-   ctx.globalAlpha=1;
-   if(progress<1)requestAnimationFrame(reveal);
-   else if(data.mode==="project")projectionRunning=false;
-   else{
-    for(const p of projectionParticles){
-     particles.push({
-      x:p.x,y:p.y,
-      vx:(p.x-W/2)*.045+(Math.random()-.5)*5,
-      vy:(p.y-H/2)*.045+(Math.random()-.5)*5,
-      life:1,decay:.01,color:p.color,size:2,gravity:.035
-     });
-    }
-    projectionParticles=[];
-    projectionRunning=false;
-    fireworksRunning=true;
-   }
-  }
-  reveal();
+ const data={
+  action,
+  target:selectedTarget,
+  updatedAt:Date.now(),
+  id:crypto.randomUUID(),
+  ...extra
  };
- if(data.image){
-  img.onload=render;
-  img.onerror=()=>{projectionRunning=false;console.error("Projectieafbeelding kon niet worden geladen");};
-  img.src=data.image;
- }else render();
-}
-
-function animate(){
- requestAnimationFrame(animate);
- if(!fireworksRunning&&!snowRunning&&!projectionRunning)return;
- if(!projectionRunning){
-  ctx.fillStyle="rgba(8,8,23,.19)";
-  ctx.fillRect(0,0,W,H);
- }
- if(snowRunning)drawSnow();
- if(fireworksRunning){
-  if(Math.random()<.012+(fireIntensity/100)*.075)launch();
-  rockets=rockets.filter(r=>{
-   r.y-=r.speed;
-   ctx.beginPath();ctx.arc(r.x,r.y,2.5,0,Math.PI*2);
-   ctx.fillStyle=r.color;ctx.fill();
-   if(r.y<=r.target){burst(r.x,r.y,r.palette,r.type);return false;}
-   return true;
-  });
-  particles=particles.filter(p=>{
-   p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.vx*=.985;p.life-=p.decay;
-   ctx.globalAlpha=Math.max(0,p.life);
-   ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-   ctx.fillStyle=p.color;ctx.fill();
-   return p.life>0;
-  });
-  ctx.globalAlpha=1;
- }
-}
-if(!animationStarted){animationStarted=true;animate();}
-
-function applyCommand(data){
- if(!data||!data.action)return;
- if(data.id&&data.id===lastCommand)return;
- if(data.id)lastCommand=data.id;
-
- if(data.action==="refresh"){
-  if(data.target==="all"||Number(data.target)===browser){
-   const refreshKey="promises2u-refresh-"+browser;
-   const handled=sessionStorage.getItem(refreshKey);
-   if(Date.now()-Number(data.updatedAt)<30000&&handled!==String(data.id||data.updatedAt)){
-    sessionStorage.setItem(refreshKey,String(data.id||data.updatedAt));
-    location.reload();
-   }
-  }
-  return;
- }
- if(data.target!=="all"&&data.target!=="1+2"&&Number(data.target)!==browser)return;
- if(data.target==="1+2"&&browser>2)return;
-
- if(data.action==="display-mode"){
-  clearEffects();
-  const mode=data.displayMode||"off";
-  if(mode==="snow"&&browser<=2){
-   snowRunning=true;createSnow();
-  }else if(mode==="fireworks"){
-   fireworksRunning=true;
-  }
-  return;
- }
- if(data.action==="start"||data.action==="resume"){
-  clearEffects();fireworksRunning=true;return;
- }
- if(data.action==="stop"){clearEffects();return;}
- if(data.action==="pause"){fireworksRunning=false;return;}
- if(data.action==="settings"){
-  fireIntensity=Number(data.fireIntensity)||65;
-  burstSize=data.burstSize||"large";
-  shellType=data.shellType||"random";
-  return;
- }
- if(data.action==="snow-on"&&browser<=2){
-  clearEffects();snowRunning=true;createSnow();return;
- }
- if(data.action==="snow-off"&&browser<=2){
-  clearEffects();return;
- }
- if(data.action==="projection"&&browser<=2){
-  if(data.id===lastProjection)return;
-  lastProjection=data.id;
-  startProjection(data);return;
- }
- if(data.action==="clear-projection"&&browser<=2){
-  clearEffects();
+ try{
+  await set(ref(db,"show"),data);
+  setStatus("Opdracht verzonden: "+action+" → "+selectedTarget);
+ }catch(error){
+  setStatus("Fout bij verzenden: "+error.message);
  }
 }
 
-if(!controller){
- let connected=false;
- onAuthStateChanged(auth,async user=>{
-  if(!user){
-   try{await signInAnonymously(auth);}
-   catch(e){console.error(e);}
+function listenForScreen(){
+ if(!isScreen||connected)return;
+ connected=true;
+ onValue(ref(db,"show"),snapshot=>{
+  const data=snapshot.val();
+  if(!data||!data.action)return;
+  if(data.id===lastCommandId)return;
+  lastCommandId=data.id||"";
+  if(data.target!=="all"&&data.target!==String(browserNumber)&&!(data.target==="1+2"&&browserNumber<=2))return;
+  if(data.action==="refresh"){
+   location.reload();
    return;
   }
-  if(!connected){
-   connected=true;
-   onValue(ref(db,"show"),snapshot=>{
-    const data=snapshot.val();
-    if(data)applyCommand(data);
-   },error=>console.error("Firebase show:",error));
-   onValue(ref(db,"settings/snowIntensity"),snapshot=>{
-    const value=Number(snapshot.val());
-    if(value>=10&&value<=100){
-     snowIntensity=value;
-     if(snowRunning)createSnow();
-    }
-   });
+  if(data.action==="start"){
+   currentDisplayMode="fireworks";currentAction="start";
+   fireIntensity=data.fireIntensity||fireIntensity;
   }
+  if(data.action==="stop"||data.action==="pause"){
+   currentAction=data.action;currentDisplayMode="off";
+  }
+  if(data.action==="resume"){
+   currentAction="start";currentDisplayMode="fireworks";
+  }
+  if(data.action==="snow-on"){
+   currentAction="snow-on";currentDisplayMode="snow";
+  }
+  if(data.action==="snow-off"){
+   currentAction="off";currentDisplayMode="off";
+  }
+  if(data.action==="settings"){
+   fireIntensity=data.fireIntensity||fireIntensity;
+  }
+  if(data.action==="display-mode"){
+   currentDisplayMode=data.displayMode||"off";
+   currentAction=currentDisplayMode==="snow"?"snow-on":currentDisplayMode==="fireworks"?"start":"off";
+  }
+  if(data.action==="projection"){
+   showProjectionOnScreen(data);
+  }
+  if(data.action==="clear-projection"){
+   clearProjectionOnScreen();
+  }
+  startAnimation();
+ });
+ onValue(ref(db,"settings/wallpaperStyle"),snapshot=>{
+  const style=snapshot.val()||"winterbos";
+  wallpaperStyle=style;
+  applyWallpaper(style);
+ });
+ onValue(ref(db,"settings/santaStartAt"),snapshot=>{
+  santaStartAt=Number(snapshot.val()||0);
+  animateSanta();
  });
 }
 
-if(controller){
- let showListener=false;
- onAuthStateChanged(auth,user=>{
-  if(user&&user.uid===ADMIN_UID&&!showListener){
-   showListener=true;
-   onValue(ref(db,"show"),snapshot=>{
-    const data=snapshot.val();
-    if(!data)return;
-    if(data.action==="display-mode"){
-     updateAllPreviews(data.displayMode||"off",data.target);
-    }else if(data.action==="stop"){
-     updateAllPreviews("off",data.target);
-    }else if(data.action==="start"||data.action==="resume"){
-     updateAllPreviews("fireworks",data.target);
-    }else if(data.action==="snow-on"){
-     updateAllPreviews("snow",data.target);
-    }else if(data.action==="snow-off"){
-     updateAllPreviews("off",data.target);
-    }
-   });
-  }
- });
+function showProjectionOnScreen(data){
+ let el=document.getElementById("screenProjection");
+ if(!el){
+  el=document.createElement("div");
+  el.id="screenProjection";
+  el.style.cssText="position:absolute;z-index:5;inset:15%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:clamp(28px,6vw,80px);font-weight:bold;text-shadow:0 3px 15px #000;background:#0005;padding:20px;border-radius:20px;color:white";
+  screen.appendChild(el);
+ }
+ el.innerHTML="";
+ if(data.image){
+  const img=document.createElement("img");
+  img.src=data.image;img.style.cssText="max-width:90%;max-height:65%;object-fit:contain";
+  el.appendChild(img);
+ }
+ if(data.text){
+  const text=document.createElement("div");
+  text.textContent=data.text;
+  el.appendChild(text);
+ }
+ const duration=Math.max(1,Number(data.duration)||15)*1000;
+ setTimeout(()=>{if(el.isConnected)el.remove();},duration);
 }
+function clearProjectionOnScreen(){
+ document.getElementById("screenProjection")?.remove();
+}
+
+function setupController(){
+ document.querySelectorAll("[data-target]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+   selectedTarget=btn.dataset.target;
+   document.querySelectorAll("[data-target]").forEach(b=>b.classList.toggle("selected",b===btn));
+  });
+ });
+ document.getElementById("startFireworks").onclick=()=>sendCommand("start",{
+  fireIntensity:Number(document.getElementById("fireIntensity").value),
+  burstSize:document.getElementById("burstSize").value,
+  shellType:document.getElementById("shellType").value
+ });
+ document.getElementById("stopShow").onclick=()=>sendCommand("stop");
+ document.getElementById("pauseShow").onclick=()=>sendCommand("pause");
+ document.getElementById("resumeShow").onclick=()=>sendCommand("resume");
+ document.getElementById("snowOn").onclick=()=>sendCommand("snow-on");
+ document.getElementById("snowOff").onclick=()=>sendCommand("snow-off");
+ document.getElementById("fireIntensity").oninput=e=>{
+  document.getElementById("fireIntensityValue").textContent=e.target.value+"%";
+ };
+ document.getElementById("snowIntensity").oninput=e=>{
+  document.getElementById("snowIntensityValue").textContent=e.target.value+"%";
+ };
+ document.getElementById("applyFireSettings").onclick=()=>sendCommand("settings",{
+  fireIntensity:Number(document.getElementById("fireIntensity").value),
+  burstSize:document.getElementById("burstSize").value,
+  shellType:document.getElementById("shellType").value
+ });
+ document.getElementById("applySnowIntensity").onclick=async()=>{
+  const value=Number(document.getElementById("snowIntensity").value);
+  try{
+   await set(ref(db,"settings/snowIntensity"),value);
+   setStatus("Sneeuwintensiteit ingesteld op "+value+"%");
+  }catch(e){setStatus("Fout: "+e.message);}
+ };
+ document.getElementById("showProjection").onclick=()=>sendCommand("projection",{
+  text:document.getElementById("projectionText").value,
+  image:document.getElementById("projectionImage").value,
+  duration:Number(document.getElementById("projectionDuration").value),
+  mode:document.getElementById("projectionMode").value
+ });
+ document.getElementById("clearProjection").onclick=()=>sendCommand("clear-projection");
+ document.getElementById("refreshScreens").onclick=()=>sendCommand("refresh");
+ document.getElementById("applyWallpaper").onclick=async()=>{
+  const style=document.getElementById("wallpaperStyle").value;
+  try{
+   await set(ref(db,"settings/wallpaperStyle"),style);
+   setStatus("Achtergrond toegepast: "+style);
+  }catch(e){setStatus("Achtergrondfout: "+e.message);}
+ };
+ document.getElementById("startSanta").onclick=async()=>{
+  try{
+   await set(ref(db,"settings/santaStartAt"),Date.now());
+   setStatus("Kerstman gestart op scherm 1 en 2.");
+  }catch(e){setStatus("Kerstmanfout: "+e.message);}
+ };
+ document.getElementById("stopSanta").onclick=async()=>{
+  try{
+   await set(ref(db,"settings/santaStartAt"),0);
+   setStatus("Kerstman gestopt.");
+  }catch(e){setStatus("Kerstmanfout: "+e.message);}
+ };
+}
+
+function drawPreview(canvasElement,screenNo){
+ const g=canvasElement.getContext("2d");
+ const w=canvasElement.width=canvasElement.clientWidth*2;
+ const h=canvasElement.height=220;
+ g.fillStyle="#030711";g.fillRect(0,0,w,h);
+ g.fillStyle="#fff";g.font="24px Arial";g.textAlign="center";
+ g.fillText("SCHERM "+screenNo,w/2,h/2);
+}
+function setupPreviews(){
+ for(let n=1;n<=5;n++){
+  const cv=document.getElementById("preview"+n);
+  drawPreview(cv,n);
+ }
+}
+
+function initScreen(){
+ document.body.innerHTML=`
+ <div id="screen">
+  <div id="wallpaper"></div>
+  <div id="traveler">🎅</div>
+  <canvas id="fireworks"></canvas>
+  <div class="screen-label" id="screenLabel"></div>
+ </div>`;
+ const label=document.getElementById("screenLabel");
+ label.textContent="PROMISES2U FIREWORKS • SCREEN "+browserNumber;
+}
+
+async function init(){
+ if(isScreen){
+  document.querySelector("header")?.remove();
+  login.remove();controller.remove();
+  screen.classList.remove("hidden");
+  document.getElementById("screenLabel").textContent="PROMISES2U FIREWORKS • SCREEN "+browserNumber;
+  resizeCanvas();
+  startAnimation();
+  startSantaAnimation();
+  onAuthStateChanged(auth,async user=>{
+   if(user){listenForScreen();}
+   else{
+    try{await signInAnonymously(auth);}
+    catch(error){console.error("Screen login error",error);}
+   }
+  });
+  return;
+ }
+ if(isController){
+  login.classList.remove("hidden");
+  controller.classList.add("hidden");
+  document.getElementById("loginButton").onclick=async()=>{
+   const email=document.getElementById("email").value.trim();
+   const password=document.getElementById("password").value;
+   const status=document.getElementById("loginStatus");
+   try{
+    const result=await signInWithEmailAndPassword(auth,email,password);
+    if(result.user.uid!==ADMIN_UID){
+     status.textContent="Dit account heeft geen beheerdersrechten.";
+     return;
+    }
+    login.classList.add("hidden");
+    controller.classList.remove("hidden");
+    setupController();
+    setupPreviews();
+    setStatus("Beheerder ingelogd en verbonden.");
+   }catch(error){status.textContent="Inloggen mislukt: "+error.message;}
+  };
+  return;
+ }
+ login.classList.remove("hidden");
+ document.getElementById("loginStatus").textContent="Open de controller via ?controller=1 of een scherm via ?browser=1 t/m 5.";
+}
+
+init();
 
 const previewLoops=new Map();
-function startPreview(canvas,mode){
- const key=canvas.id;
- if(previewLoops.has(key))return;
- const c=canvas.getContext("2d");
- const w=canvas.width=Math.max(1,canvas.clientWidth*2);
- const h=canvas.height=Math.max(1,canvas.clientHeight*2);
- const dots=Array.from({length:42},()=>({x:Math.random()*w,y:Math.random()*h,v:.7+Math.random()*2.2,a:Math.random()*6.28}));
- const loop=()=>{
-  c.fillStyle="#030711";c.fillRect(0,0,w,h);
-  if(canvas.dataset.mode==="snow"){
-   c.fillStyle="#e5f5ff";
-   for(const p of dots){p.y+=p.v;p.x+=Math.sin(p.a+=.025)*.45;if(p.y>h)p.y=0;c.beginPath();c.arc(p.x,p.y,2,0,Math.PI*2);c.fill();}
-  }else if(canvas.dataset.mode==="fireworks"){
-   const t=Date.now()/650;
-   for(let i=0;i<38;i++){
-    const angle=i*Math.PI*2/38;
-    const radius=(Math.sin(t+i*.17)*.12+.35)*Math.min(w,h);
-    const x=w/2+Math.cos(angle)*radius,y=h/2+Math.sin(angle)*radius;
-    c.fillStyle=colors[(Number(canvas.dataset.screen)-1)%5][i%4];
-    c.globalAlpha=.55+.45*Math.sin(t+i);
-    c.beginPath();c.arc(x,y,1.5+(i%3),0,Math.PI*2);c.fill();
-   }
-   c.globalAlpha=1;
-  }
-  if(canvas.dataset.mode!=="off")requestAnimationFrame(loop);
-  else{c.clearRect(0,0,w,h);previewLoops.delete(key);}
- };
- previewLoops.set(key,true);loop();
-}
-function updatePreview(screenNumber,mode){
- const label=document.getElementById("previewStatus"+screenNumber);
- const canvas=document.getElementById("preview"+screenNumber);
- if(!label||!canvas)return;
- label.textContent=mode==="snow"?"SNEEUW":mode==="fireworks"?"VUURWERK":"UIT";
- canvas.dataset.mode=mode;
- if(mode!=="off")startPreview(canvas,mode);
- else{const c=canvas.getContext("2d");c.clearRect(0,0,canvas.width,canvas.height);previewLoops.delete(canvas.id);}
-}
-for(let n=1;n<=5;n++){
- const c=document.getElementById("preview"+n);
- c.dataset.screen=n;c.dataset.mode="off";
-}
 function drawStylePreviews(){
  const styleList=["chrysanthemum","peony","palm","willow","crossette","kamuro","ring","heart","star","comet","glitter","rainbow"];
  styleList.forEach((style,index)=>{
