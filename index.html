@@ -56,7 +56,41 @@ textarea{min-height:75px;resize:vertical}
 .style-card b{font-size:12px;color:#fff}
 .style-card small{font-size:10px;line-height:1.35;color:var(--muted);font-weight:normal}
 .style-card.selected{border:2px solid #e9ad42;background:#1a2943;box-shadow:0 0 14px #e9ad4233}
-@media(max-width:600px){header h1{font-size:21px}.panel{padding:13px}main{width:94%}}
+
+/* Professioneel responsief bedieningspaneel */
+#controller main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+#controller main>.panel{margin:0;min-width:0}
+#controller main>.panel:first-child,#controller main>.panel:nth-last-child(1){grid-column:1/-1}
+#controller .panel{background:linear-gradient(145deg,rgba(22,36,61,.98),rgba(13,23,41,.98));border-color:#304665}
+#controller h2{display:flex;align-items:center;gap:9px}
+#controller header{position:sticky;top:0;z-index:10;background:#091326ee;backdrop-filter:blur(14px)}
+.control-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.control-hero strong{font-size:20px;letter-spacing:.4px}
+.control-actions{display:flex;gap:8px;flex-wrap:wrap}
+.bg-studio-preview{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.bg-preview{aspect-ratio:16/9;border:1px solid #526987;border-radius:12px;background:#070d19 center/cover no-repeat;position:relative;overflow:hidden;box-shadow:inset 0 0 40px #0008}
+.bg-preview span{position:absolute;left:9px;bottom:9px;background:#07101ddd;padding:6px 9px;border-radius:7px;font-size:12px;font-weight:bold}
+.bg-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.bg-controls>div{min-width:0}
+.bg-note{padding:12px;border:1px solid #344967;border-radius:10px;background:#0a1426;margin-top:12px}
+#controller button{min-height:44px}
+#controller input[type=file]{font-size:12px}
+#controller .screen-select{grid-template-columns:repeat(auto-fit,minmax(88px,1fr))}
+@media(max-width:760px){
+ header{padding:16px 12px}
+ #controller main{display:flex;flex-direction:column;width:calc(100% - 20px);margin:12px auto}
+ #controller main>.panel{width:100%}
+ .bg-studio-preview{grid-template-columns:1fr}
+ .bg-preview{aspect-ratio:16/9}
+ .bg-controls{grid-template-columns:1fr}
+ .control-hero{align-items:flex-start}
+ .control-actions{width:100%}
+ .control-actions button{flex:1}
+ #controller .screen-select{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #controller .mode-buttons{grid-template-columns:1fr 1fr}
+ #controller .row{gap:8px}
+ #controller .row>*{min-width:0}
+}
 </style>
 </head>
 <body>
@@ -79,8 +113,18 @@ textarea{min-height:75px;resize:vertical}
 <div id="controller" class="hidden">
 <main>
 
+<section class="panel control-hero">
+<div>
+<strong>🎛️ Control Center</strong>
+<div class="small">Promises2U • Fireworks & Atmosphere</div>
+</div>
+<div class="control-actions">
+<button id="refreshController" class="primary">↻ Controller verversen</button>
+</div>
+</section>
+
 <section class="panel">
-<h2>🎮 Controller</h2>
+<h2>🎮 Schermselectie</h2>
 <p class="small">Selecteer de schermen waarop je de effecten wilt uitvoeren.</p>
 <div class="screen-select" id="screenTargets">
 <button data-target="1" class="selected">Scherm 1</button>
@@ -160,18 +204,73 @@ textarea{min-height:75px;resize:vertical}
 </div>
 </section>
 
-<section class="panel">
-<h2>🎄 Kerstlandschap voor scherm 1 en 2</h2>
-<p class="small">Scherm 1 toont de linkerhelft en scherm 2 de rechterhelft. Schermen 3, 4 en 5 behouden hun effectenscherm zonder achtergrond.</p>
-<label>Kies het landschap</label>
+<section class="panel" id="backgroundStudio">
+<h2>🖼️ Achtergrondstudio</h2>
+<p class="small">Beheer de doorlopende achtergrond voor scherm 1 en 2. Scherm 1 gebruikt links, scherm 2 rechts. Schermen 3, 4 en 5 blijven effectenschermen zonder wallpaper.</p>
+
+<label>Voorinstelling</label>
 <select id="wallpaperStyle">
 <option value="winterbos">Winterbos</option>
 <option value="alpendorp">Alpendorp</option>
 <option value="frozen-lake">Bevroren meer</option>
 <option value="moonlight">Moonlight</option>
 </select>
-<button id="applyWallpaper" class="primary" style="width:100%;margin-top:12px">ACHTERGROND TOEPASSEN</button>
-<div class="small" style="margin-top:10px">Zorg dat de map backgrounds naast index.html staat.</div>
+
+<div class="bg-studio-preview">
+<div class="bg-preview" id="bgPreviewLeft"><span>Scherm 1 • Links</span></div>
+<div class="bg-preview" id="bgPreviewRight"><span>Scherm 2 • Rechts</span></div>
+</div>
+
+<h3>Eigen afbeeldingen</h3>
+<div class="bg-controls">
+<div>
+<label>Eigen foto voor scherm 1 (lokaal voorbeeld)</label>
+<input type="file" id="customLeftFile" accept="image/*">
+</div>
+<div>
+<label>Eigen foto voor scherm 2 (lokaal voorbeeld)</label>
+<input type="file" id="customRightFile" accept="image/*">
+</div>
+<div>
+<label>GitHub-pad scherm 1</label>
+<input id="customLeftPath" placeholder="backgrounds/mijn-foto-left.jpg">
+</div>
+<div>
+<label>GitHub-pad scherm 2</label>
+<input id="customRightPath" placeholder="backgrounds/mijn-foto-right.jpg">
+</div>
+</div>
+
+<div class="bg-note small">
+<strong>Belangrijk:</strong> een gekozen bestand is alleen een tijdelijk voorbeeld op deze controller. Voor weergave op alle schermen upload je beide foto's eerst naar de map <b>backgrounds</b> in GitHub. Vul daarna hier de bestandsnamen in. Er is geen Firebase Storage of betaalde upgrade nodig.
+</div>
+
+<h3 style="margin-top:16px">Beeldinstellingen</h3>
+<div class="bg-controls">
+<div>
+<label>Vulling</label>
+<select id="bgFit">
+<option value="cover">Vullend (cover)</option>
+<option value="contain">Volledig tonen (contain)</option>
+</select>
+</div>
+<div>
+<label>Zoom <strong id="bgZoomValue">100%</strong></label>
+<input type="range" id="bgZoom" min="100" max="180" value="100">
+</div>
+<div>
+<label>Horizontale positie <strong id="bgXValue">50%</strong></label>
+<input type="range" id="bgPositionX" min="0" max="100" value="50">
+</div>
+<div>
+<label>Verticale positie <strong id="bgYValue">50%</strong></label>
+<input type="range" id="bgPositionY" min="0" max="100" value="50">
+</div>
+</div>
+
+<button id="applyWallpaper" class="primary" style="width:100%;margin-top:14px">✓ ACHTERGROND TOEPASSEN OP SCHERM 1 + 2</button>
+<div class="small" style="margin-top:9px">Instellingen worden opgeslagen in Firebase Realtime Database.</div>
+
 <div class="divider"></div>
 <h3>🎅 Kerstman over de twee schermen</h3>
 <p class="small">Start de Kerstman op scherm 1. De animatie loopt daarna door naar scherm 2.</p>
@@ -184,7 +283,7 @@ textarea{min-height:75px;resize:vertical}
 <section class="panel">
 <h2>🔄 Schermbeheer</h2>
 <button id="refreshScreens" class="primary" style="width:100%">VERVERS GESELECTEERDE SCHERMEN</button>
-<p class="small">De geselecteerde schermen ontvangen een verversopdracht.</p>
+<p class="small">De geselecteerde schermen ontvangen een verversopdracht. Dit is apart van de controller-verversknop.</p>
 </section>
 
 <section class="panel">
@@ -268,6 +367,7 @@ let snowflakes=[];
 let animationFrame=0;
 let santaStartAt=0;
 let wallpaperStyle="winterbos";
+let activeWallpaperConfig=null;
 let lastCommandId="";
 let screenSettings={};
 
@@ -293,11 +393,15 @@ function resizeCanvas(){
 addEventListener("resize",resizeCanvas);
 resizeCanvas();
 
-function applyWallpaper(style){
- if(!isScreen||browserNumber>2)return;
+function applyWallpaper(style,config=null){
+ if(!isScreen)return;
+ if(browserNumber>2){wallpaper.style.display="none";return;}
  const pair=wallpaperFiles[style]||wallpaperFiles.winterbos;
- const file=pair[browserNumber-1];
+ const file=config?(browserNumber===1?config.left:config.right):pair[browserNumber-1];
  wallpaper.style.backgroundImage=`url("${file}")`;
+ wallpaper.style.backgroundSize=config?(config.fit==="contain"?"contain":`${Number(config.zoom||100)}% auto`):"cover";
+ wallpaper.style.backgroundPosition=config?`${Number(config.positionX??50)}% ${Number(config.positionY??50)}%`:"center";
+ wallpaper.style.backgroundRepeat="no-repeat";
  wallpaper.style.display="block";
  wallpaperStyle=style;
 }
@@ -359,91 +463,73 @@ function makeBurst(x,y,type,size){
 
 function launchRandomBurst(){
  if(currentAction!=="start"&&currentDisplayMode!=="fireworks")return;
- const type=document.getElementById("shellType")?.value||"random";
- const size=document.getElementById("burstSize")?.value||"normal";
- const styles=["classic","ring","heart","star","willow","comet","glitter","rainbow","chrysanthemum","palm","crossette","kamuro"];
- const chosen=type==="random"?styles[Math.floor(Math.random()*styles.length)]:type;
- makeBurst(random(innerWidth*.12,innerWidth*.88),random(innerHeight*.12,innerHeight*.52),chosen,size);
+ const type=screenSettings.shellType||"random";
+ const selected=type==="random"?["classic","ring","heart","star","willow","comet","glitter","rainbow","chrysanthemum","palm","crossette","kamuro"][Math.floor(Math.random()*12)]:type;
+ const size=screenSettings.burstSize||"normal";
+ makeBurst(random(innerWidth*.15,innerWidth*.85),random(innerHeight*.15,innerHeight*.55),selected,size);
 }
 
-function drawFireworks(){
- if(!isScreen)return;
+function drawFrame(){
  ctx.clearRect(0,0,innerWidth,innerHeight);
  if(currentAction==="start"||currentDisplayMode==="fireworks"){
-  if(Math.random()<fireIntensity/500)launchRandomBurst();
+  if(Math.random()<fireIntensity/100*.08)launchRandomBurst();
  }
- particles=particles.filter(p=>p.age<p.life);
- for(const p of particles){
+ for(let i=particles.length-1;i>=0;i--){
+  const p=particles[i];
   p.age++;
   if(p.offset){
-   const alpha=1-p.age/p.life;
-   ctx.globalAlpha=alpha;
-   ctx.fillStyle=p.color;
-   ctx.beginPath();
-   ctx.arc(p.x+p.ox,p.y+p.oy,p.size,0,Math.PI*2);
-   ctx.fill();
-   continue;
+   p.life--;
+   if(p.life<=0){particles.splice(i,1);continue;}
+  }else{
+   p.x+=p.vx;
+   p.y+=p.vy;
+   p.vy+=p.gravity||.025;
+   p.vx*=.992;
+   p.vy*=.992;
+   p.life--;
+   if(p.life<=0){particles.splice(i,1);continue;}
   }
-  p.x+=p.vx;p.y+=p.vy;
-  p.vy+=(p.gravity||.025);
-  p.vx*=.992;p.vy*=.992;
-  ctx.globalAlpha=Math.max(0,1-p.age/p.life);
+  ctx.globalAlpha=Math.max(0,p.life/(p.offset?100:115));
   ctx.fillStyle=p.color;
   ctx.beginPath();
   ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
   ctx.fill();
  }
  ctx.globalAlpha=1;
- if(currentDisplayMode==="snow"||currentAction==="snow-on"){
-  const amount=Math.floor(snowIntensity*1.5);
-  while(snowflakes.length<amount){
-   snowflakes.push({x:random(0,innerWidth),y:random(-innerHeight,0),r:random(1,4),v:random(.6,2.5),drift:random(-.5,.5)});
+ if(currentDisplayMode==="snow"){
+  if(Math.random()<snowIntensity/100*.7){
+   snowflakes.push({x:random(0,innerWidth),y:-5,r:random(1,4),speed:random(.5,2.5),drift:random(-.5,.5)});
   }
-  snowflakes.forEach(f=>{
-   f.y+=f.v;f.x+=f.drift;
-   if(f.y>innerHeight){f.y=-5;f.x=random(0,innerWidth);}
-   ctx.fillStyle="#ffffff";
-   ctx.globalAlpha=.7;
-   ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();
-  });
- }else{snowflakes=[];}
- ctx.globalAlpha=1;
- animationFrame=requestAnimationFrame(drawFireworks);
-}
-
-function startAnimation(){
- if(animationFrame)cancelAnimationFrame(animationFrame);
- if(isScreen)drawFireworks();
-}
-
-function updateScreenStatus(action){
- currentAction=action||"off";
- if(action==="start")currentDisplayMode="fireworks";
- if(action==="snow-on")currentDisplayMode="snow";
- if(action==="snow-off"||action==="stop")currentDisplayMode="off";
- if(action==="pause")currentDisplayMode="off";
- if(action==="resume")currentDisplayMode="fireworks";
- startAnimation();
-}
-
-async function sendCommand(action,extra={}){
- if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID){
-  setStatus("Geen beheerdersrechten. Log opnieuw in.");
-  return;
+  for(let i=snowflakes.length-1;i>=0;i--){
+   const f=snowflakes[i];
+   f.y+=f.speed;
+   f.x+=f.drift+Math.sin(f.y/25)*.4;
+   ctx.fillStyle="#ffffffcc";
+   ctx.beginPath();
+   ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
+   ctx.fill();
+   if(f.y>innerHeight+10)snowflakes.splice(i,1);
+  }
  }
+ animationFrame=requestAnimationFrame(drawFrame);
+}
+
+function setDisplayMode(mode){
+ currentDisplayMode=mode;
+ if(mode==="off"){particles=[];snowflakes=[];}
+ if(mode==="snow"){particles=[];}
+ if(mode==="fireworks"){snowflakes=[];}
+}
+
+function sendCommand(action,extra={}){
  const data={
   action,
   target:selectedTarget,
+  id:Date.now().toString()+"-"+Math.random().toString(36).slice(2),
   updatedAt:Date.now(),
-  id:crypto.randomUUID(),
   ...extra
  };
- try{
-  await set(ref(db,"show"),data);
-  setStatus("Opdracht verzonden: "+action+" → "+selectedTarget);
- }catch(error){
-  setStatus("Fout bij verzenden: "+error.message);
- }
+ return set(ref(db,"show"),data).then(()=>setStatus("Opdracht verzonden: "+action+" → "+selectedTarget)).catch(error=>setStatus("Fout bij verzenden: "+error.message));
 }
 
 function listenForScreen(){
@@ -455,44 +541,58 @@ function listenForScreen(){
   if(data.id===lastCommandId)return;
   lastCommandId=data.id||"";
   if(data.target!=="all"&&data.target!==String(browserNumber)&&!(data.target==="1+2"&&browserNumber<=2))return;
-  if(data.action==="refresh"){
-   location.reload();
-   return;
-  }
   if(data.action==="start"){
-   currentDisplayMode="fireworks";currentAction="start";
-   fireIntensity=data.fireIntensity||fireIntensity;
+   currentAction="start";
+   setDisplayMode("fireworks");
+   fireIntensity=Number(data.fireIntensity||65);
+   screenSettings=data;
   }
-  if(data.action==="stop"||data.action==="pause"){
-   currentAction=data.action;currentDisplayMode="off";
+  if(data.action==="stop"){
+   currentAction="off";
+   setDisplayMode("off");
+  }
+  if(data.action==="pause"){
+   currentAction="pause";
+   setDisplayMode("off");
   }
   if(data.action==="resume"){
-   currentAction="start";currentDisplayMode="fireworks";
+   currentAction="start";
+   setDisplayMode("fireworks");
   }
   if(data.action==="snow-on"){
-   currentAction="snow-on";currentDisplayMode="snow";
+   currentAction="snow";
+   setDisplayMode("snow");
   }
   if(data.action==="snow-off"){
-   currentAction="off";currentDisplayMode="off";
+   currentAction="off";
+   setDisplayMode("off");
   }
   if(data.action==="settings"){
-   fireIntensity=data.fireIntensity||fireIntensity;
+   fireIntensity=Number(data.fireIntensity||fireIntensity);
+   snowIntensity=Number(data.snowIntensity||snowIntensity);
+   screenSettings=data;
   }
   if(data.action==="display-mode"){
-   currentDisplayMode=data.displayMode||"off";
-   currentAction=currentDisplayMode==="snow"?"snow-on":currentDisplayMode==="fireworks"?"start":"off";
+   setDisplayMode(data.displayMode||"off");
   }
-  if(data.action==="projection"){
-   showProjectionOnScreen(data);
+  if(data.action==="projection")showProjectionOnScreen(data);
+  if(data.action==="clear-projection")clearProjectionOnScreen();
+  if(data.action==="refresh")location.reload();
+ });
+ onValue(ref(db,"settings/wallpaperConfig"),snapshot=>{
+  const config=snapshot.val();
+  activeWallpaperConfig=(config&&config.left&&config.right)?config:null;
+  if(activeWallpaperConfig){
+   wallpaperStyle=activeWallpaperConfig.style||"winterbos";
+   applyWallpaper(wallpaperStyle,activeWallpaperConfig);
+  }else{
+   applyWallpaper(wallpaperStyle);
   }
-  if(data.action==="clear-projection"){
-   clearProjectionOnScreen();
-  }
-  startAnimation();
  });
  onValue(ref(db,"settings/wallpaperStyle"),snapshot=>{
   const style=snapshot.val()||"winterbos";
   wallpaperStyle=style;
+  if(!isScreen||browserNumber>2||activeWallpaperConfig)return;
   applyWallpaper(style);
  });
  onValue(ref(db,"settings/santaStartAt"),snapshot=>{
@@ -506,62 +606,119 @@ function showProjectionOnScreen(data){
  if(!el){
   el=document.createElement("div");
   el.id="screenProjection";
-  el.style.cssText="position:absolute;z-index:5;inset:15%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:clamp(28px,6vw,80px);font-weight:bold;text-shadow:0 3px 15px #000;background:#0005;padding:20px;border-radius:20px;color:white";
-  screen.appendChild(el);
+  el.style.cssText="position:absolute;z-index:5;inset:15%;display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;color:white;font-size:clamp(24px,5vw,72px);font-weight:bold;text-shadow:0 3px 12px #000;background:#0005;border-radius:20px;padding:20px";
+  document.getElementById("screen").appendChild(el);
  }
  el.innerHTML="";
- if(data.image){
-  const img=document.createElement("img");
-  img.src=data.image;img.style.cssText="max-width:90%;max-height:65%;object-fit:contain";
-  el.appendChild(img);
- }
  if(data.text){
   const text=document.createElement("div");
   text.textContent=data.text;
   el.appendChild(text);
  }
- const duration=Math.max(1,Number(data.duration)||15)*1000;
- setTimeout(()=>{if(el.isConnected)el.remove();},duration);
+ if(data.image){
+  const img=document.createElement("img");
+  img.src=data.image;
+  img.style.cssText="max-width:90%;max-height:65%;object-fit:contain;margin-top:12px";
+  el.appendChild(img);
+ }
+ const duration=Math.max(1,Number(data.duration||15));
+ setTimeout(()=>el.remove(),duration*1000);
 }
+
 function clearProjectionOnScreen(){
  document.getElementById("screenProjection")?.remove();
 }
 
 function setupController(){
+ const previewLeft=document.getElementById("bgPreviewLeft");
+ const previewRight=document.getElementById("bgPreviewRight");
+ let localLeft="",localRight="";
+
+ const updateBackgroundPreview=()=>{
+  const style=document.getElementById("wallpaperStyle").value;
+  const left=document.getElementById("customLeftPath").value.trim()||wallpaperFiles[style][0];
+  const right=document.getElementById("customRightPath").value.trim()||wallpaperFiles[style][1];
+  const fit=document.getElementById("bgFit").value;
+  const zoom=Number(document.getElementById("bgZoom").value);
+  const x=Number(document.getElementById("bgPositionX").value);
+  const y=Number(document.getElementById("bgPositionY").value);
+  [previewLeft,previewRight].forEach((el,i)=>{
+   const url=i===0?(localLeft||left):(localRight||right);
+   el.style.backgroundImage=`url("${url}")`;
+   el.style.backgroundSize=fit==="contain"?"contain":`${zoom}% auto`;
+   el.style.backgroundPosition=`${x}% ${y}%`;
+  });
+  document.getElementById("bgZoomValue").textContent=zoom+"%";
+  document.getElementById("bgXValue").textContent=x+"%";
+  document.getElementById("bgYValue").textContent=y+"%";
+ };
+
+ document.getElementById("wallpaperStyle").addEventListener("change",()=>{
+  localLeft="";
+  localRight="";
+  document.getElementById("customLeftPath").value="";
+  document.getElementById("customRightPath").value="";
+  updateBackgroundPreview();
+ });
+
+ ["bgFit","bgZoom","bgPositionX","bgPositionY","customLeftPath","customRightPath"].forEach(id=>{
+  document.getElementById(id).addEventListener("input",updateBackgroundPreview);
+ });
+
+ const loadLocalPreview=(input,side)=>{
+  input.addEventListener("change",()=>{
+   const file=input.files&&input.files[0];
+   if(!file)return;
+   const reader=new FileReader();
+   reader.onload=()=>{
+    if(side==="left")localLeft=reader.result;
+    else localRight=reader.result;
+    updateBackgroundPreview();
+    setStatus("Lokale preview geladen. Upload deze foto eerst naar GitHub om toe te passen op de schermen.");
+   };
+   reader.readAsDataURL(file);
+  });
+ };
+
+ loadLocalPreview(document.getElementById("customLeftFile"),"left");
+ loadLocalPreview(document.getElementById("customRightFile"),"right");
+ updateBackgroundPreview();
+
  document.querySelectorAll("[data-target]").forEach(btn=>{
   btn.addEventListener("click",()=>{
    selectedTarget=btn.dataset.target;
    document.querySelectorAll("[data-target]").forEach(b=>b.classList.toggle("selected",b===btn));
+   setStatus("Doelscherm geselecteerd: "+selectedTarget);
   });
  });
- document.getElementById("startFireworks").onclick=()=>sendCommand("start",{
-  fireIntensity:Number(document.getElementById("fireIntensity").value),
-  burstSize:document.getElementById("burstSize").value,
-  shellType:document.getElementById("shellType").value
- });
+
+ document.getElementById("startFireworks").onclick=()=>{
+  sendCommand("start",{
+   fireIntensity:Number(document.getElementById("fireIntensity").value),
+   burstSize:document.getElementById("burstSize").value,
+   shellType:document.getElementById("shellType").value
+  });
+ };
  document.getElementById("stopShow").onclick=()=>sendCommand("stop");
  document.getElementById("pauseShow").onclick=()=>sendCommand("pause");
  document.getElementById("resumeShow").onclick=()=>sendCommand("resume");
- document.getElementById("snowOn").onclick=()=>sendCommand("snow-on");
- document.getElementById("snowOff").onclick=()=>sendCommand("snow-off");
+
  document.getElementById("fireIntensity").oninput=e=>{
   document.getElementById("fireIntensityValue").textContent=e.target.value+"%";
- };
- document.getElementById("snowIntensity").oninput=e=>{
-  document.getElementById("snowIntensityValue").textContent=e.target.value+"%";
  };
  document.getElementById("applyFireSettings").onclick=()=>sendCommand("settings",{
   fireIntensity:Number(document.getElementById("fireIntensity").value),
   burstSize:document.getElementById("burstSize").value,
   shellType:document.getElementById("shellType").value
  });
- document.getElementById("applySnowIntensity").onclick=async()=>{
-  const value=Number(document.getElementById("snowIntensity").value);
-  try{
-   await set(ref(db,"settings/snowIntensity"),value);
-   setStatus("Sneeuwintensiteit ingesteld op "+value+"%");
-  }catch(e){setStatus("Fout: "+e.message);}
+
+ document.getElementById("snowOn").onclick=()=>sendCommand("snow-on");
+ document.getElementById("snowOff").onclick=()=>sendCommand("snow-off");
+ document.getElementById("snowIntensity").oninput=e=>{
+  document.getElementById("snowIntensityValue").textContent=e.target.value+"%";
  };
+ document.getElementById("applySnowIntensity").onclick=()=>set(ref(db,"settings/snowIntensity"),Number(document.getElementById("snowIntensity").value)).then(()=>setStatus("Sneeuwintensiteit opgeslagen.")).catch(e=>setStatus("Fout: "+e.message));
+
  document.getElementById("showProjection").onclick=()=>sendCommand("projection",{
   text:document.getElementById("projectionText").value,
   image:document.getElementById("projectionImage").value,
@@ -569,36 +726,63 @@ function setupController(){
   mode:document.getElementById("projectionMode").value
  });
  document.getElementById("clearProjection").onclick=()=>sendCommand("clear-projection");
+
  document.getElementById("refreshScreens").onclick=()=>sendCommand("refresh");
+ document.getElementById("refreshController").onclick=()=>location.reload();
+
  document.getElementById("applyWallpaper").onclick=async()=>{
   const style=document.getElementById("wallpaperStyle").value;
+  const left=document.getElementById("customLeftPath").value.trim()||wallpaperFiles[style][0];
+  const right=document.getElementById("customRightPath").value.trim()||wallpaperFiles[style][1];
+  const config={
+   style,
+   left,
+   right,
+   fit:document.getElementById("bgFit").value,
+   zoom:Number(document.getElementById("bgZoom").value),
+   positionX:Number(document.getElementById("bgPositionX").value),
+   positionY:Number(document.getElementById("bgPositionY").value)
+  };
+  if(!left.startsWith("backgrounds/")||!right.startsWith("backgrounds/")){
+   setStatus("Gebruik paden binnen de map backgrounds/ in GitHub.");
+   return;
+  }
   try{
-   await set(ref(db,"settings/wallpaperStyle"),style);
-   setStatus("Achtergrond toegepast: "+style);
-  }catch(e){setStatus("Achtergrondfout: "+e.message);}
+   await set(ref(db,"settings/wallpaperConfig"),config);
+   setStatus("Achtergrondinstellingen opgeslagen voor scherm 1 en 2.");
+  }catch(e){
+   setStatus("Achtergrondfout: "+e.message+" — controleer de RTDB-regels.");
+  }
  };
- document.getElementById("startSanta").onclick=async()=>{
-  try{
-   await set(ref(db,"settings/santaStartAt"),Date.now());
-   setStatus("Kerstman gestart op scherm 1 en 2.");
-  }catch(e){setStatus("Kerstmanfout: "+e.message);}
- };
- document.getElementById("stopSanta").onclick=async()=>{
-  try{
-   await set(ref(db,"settings/santaStartAt"),0);
-   setStatus("Kerstman gestopt.");
-  }catch(e){setStatus("Kerstmanfout: "+e.message);}
- };
+
+ document.getElementById("startSanta").onclick=()=>set(ref(db,"settings/santaStartAt"),Date.now()).then(()=>setStatus("Kerstman gestart."));
+ document.getElementById("stopSanta").onclick=()=>set(ref(db,"settings/santaStartAt"),0).then(()=>setStatus("Kerstman gestopt."));
+
+ setupPreviews();
 }
 
-function drawPreview(canvasElement,screenNo){
- const g=canvasElement.getContext("2d");
- const w=canvasElement.width=canvasElement.clientWidth*2;
- const h=canvasElement.height=220;
- g.fillStyle="#030711";g.fillRect(0,0,w,h);
- g.fillStyle="#fff";g.font="24px Arial";g.textAlign="center";
- g.fillText("SCHERM "+screenNo,w/2,h/2);
+function drawPreview(canvasElement,number){
+ const c=canvasElement;
+ if(!c)return;
+ const context=c.getContext("2d");
+ c.width=320;
+ c.height=110;
+ context.fillStyle="#080d1b";
+ context.fillRect(0,0,c.width,c.height);
+ if(number<=2){
+  context.fillStyle="#14294b";
+  context.fillRect(0,65,c.width,45);
+ }
+ for(let i=0;i<16;i++){
+  const x=Math.random()*c.width;
+  const y=Math.random()*75;
+  context.fillStyle=["#ffd166","#ffb703","#fff1a8","#ffffff","#ff8c42"][i%5];
+  context.beginPath();
+  context.arc(x,y,Math.random()*2+1,0,Math.PI*2);
+  context.fill();
+ }
 }
+
 function setupPreviews(){
  for(let n=1;n<=5;n++){
   const cv=document.getElementById("preview"+n);
@@ -621,81 +805,61 @@ function initScreen(){
 async function init(){
  if(isScreen){
   document.querySelector("header")?.remove();
-  login.remove();controller.remove();
+  login.remove();
+  controller.remove();
   screen.classList.remove("hidden");
   document.getElementById("screenLabel").textContent="PROMISES2U FIREWORKS • SCREEN "+browserNumber;
   resizeCanvas();
   startAnimation();
   startSantaAnimation();
   onAuthStateChanged(auth,async user=>{
-   if(user){listenForScreen();}
-   else{
+   if(user){
+    listenForScreen();
+   }else{
     try{await signInAnonymously(auth);}
     catch(error){console.error("Screen login error",error);}
    }
   });
   return;
  }
+
  if(isController){
   login.classList.remove("hidden");
   controller.classList.add("hidden");
   document.getElementById("loginButton").onclick=async()=>{
-   const email=document.getElementById("email").value.trim();
-   const password=document.getElementById("password").value;
    const status=document.getElementById("loginStatus");
+   status.textContent="Bezig met inloggen...";
    try{
-    const result=await signInWithEmailAndPassword(auth,email,password);
-    if(result.user.uid!==ADMIN_UID){
-     status.textContent="Dit account heeft geen beheerdersrechten.";
-     return;
+    const credential=await signInWithEmailAndPassword(
+     auth,
+     document.getElementById("email").value,
+     document.getElementById("password").value
+    );
+    if(credential.user.uid!==ADMIN_UID){
+     await auth.signOut();
+     throw new Error("Dit account heeft geen beheerderstoegang.");
     }
     login.classList.add("hidden");
     controller.classList.remove("hidden");
     setupController();
-    setupPreviews();
     setStatus("Beheerder ingelogd en verbonden.");
-   }catch(error){status.textContent="Inloggen mislukt: "+error.message;}
+   }catch(error){
+    status.textContent="Inloggen mislukt: "+error.message;
+   }
   };
   return;
  }
+
  login.classList.remove("hidden");
- document.getElementById("loginStatus").textContent="Open de controller via ?controller=1 of een scherm via ?browser=1 t/m 5.";
+ document.getElementById("loginStatus").textContent="Open de controller via ?controller=1 of een scherm via ?browser=1 t/m ?browser=5.";
+}
+
+function startAnimation(){
+ if(animationFrame)cancelAnimationFrame(animationFrame);
+ drawFrame();
 }
 
 init();
-
-const previewLoops=new Map();
-function drawStylePreviews(){
- const styleList=["chrysanthemum","peony","palm","willow","crossette","kamuro","ring","heart","star","comet","glitter","rainbow"];
- styleList.forEach((style,index)=>{
-  const cv=document.getElementById("stylePreview-"+style);
-  if(!cv)return;
-  const g=cv.getContext("2d");
-  const w=cv.width=Math.max(1,cv.clientWidth*2),h=164;
-  const palette=style==="rainbow"?["#ff3b30","#ff9500","#ffcc00","#34c759","#00c7be","#007aff","#bf5af2"]:["#ffd166","#ffb703","#fff1a8","#ffffff"];
-  const dots=Array.from({length:52},(_,i)=>({a:Math.PI*2*i/52,r:10+Math.random()*23,v:.5+Math.random()*1.1,phase:Math.random()*6.28}));
-  const draw=()=>{
-   g.fillStyle="#030711";g.fillRect(0,0,w,h);
-   const t=Date.now()/700;
-   dots.forEach((p,i)=>{
-    let a=p.a+t*.12;
-    let r=p.r+Math.sin(t*p.v+p.phase)*5;
-    if(style==="ring")r=29+Math.sin(t+p.phase)*2;
-    if(style==="star")r=(i%2?18:37)+Math.sin(t+p.phase)*3;
-    if(style==="heart"){const q=a;const hx=16*Math.pow(Math.sin(q),3),hy=-(13*Math.cos(q)-5*Math.cos(2*q)-2*Math.cos(3*q)-Math.cos(4*q));g.fillStyle=palette[i%palette.length];g.globalAlpha=.9;g.beginPath();g.arc(w/2+hx*1.25,h/2+hy*.85,2.5,0,6.28);g.fill();return;}
-    if(style==="palm"||style==="willow"||style==="kamuro")r*=.7+Math.abs(Math.sin(a))*1.1;
-    if(style==="comet")r=(i/52)*48;
-    g.fillStyle=palette[(style==="rainbow"?i:index)%palette.length];
-    g.globalAlpha=.55+.45*Math.sin(t*1.7+p.phase);
-    g.beginPath();g.arc(w/2+Math.cos(a)*r,h/2+Math.sin(a)*r*.65,style==="glitter"?1.3:2.1,0,6.28);g.fill();
-   });
-   g.globalAlpha=1;
-   requestAnimationFrame(draw);
-  };
-  draw();
- });
-}
-drawStylePreviews();
 </script>
 </body>
 </html>
