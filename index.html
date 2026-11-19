@@ -42,27 +42,7 @@ textarea{min-height:75px;resize:vertical}
 #screen{position:fixed;inset:0;background:#080817;overflow:hidden}
 #wallpaper{position:absolute;inset:0;background:#080817 center/cover no-repeat;display:none}
 #fireworks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-#traveler{position:absolute;z-index:3;left:0;top:68%;width:clamp(76px,10vw,118px);height:auto;display:none;pointer-events:none;will-change:transform;filter:drop-shadow(0 5px 8px #000)}
-#traveler svg{display:block;width:100%;height:auto;overflow:visible}
-#traveler .santa-body{transform-box:fill-box;transform-origin:center;animation:santaBob .48s ease-in-out infinite alternate}
-#traveler .leg-back{transform-box:fill-box;transform-origin:top center;animation:legBack .48s ease-in-out infinite alternate}
-#traveler .leg-front{transform-box:fill-box;transform-origin:top center;animation:legFront .48s ease-in-out infinite alternate}
-#traveler .arm-back{transform-box:fill-box;transform-origin:top center;animation:armBack .48s ease-in-out infinite alternate}
-#traveler .arm-front{transform-box:fill-box;transform-origin:top center;animation:armFront .48s ease-in-out infinite alternate}
-@keyframes santaBob{from{transform:translateY(0) rotate(-1deg)}to{transform:translateY(-4px) rotate(1deg)}}
-@keyframes legBack{from{transform:rotate(23deg)}to{transform:rotate(-23deg)}}
-@keyframes legFront{from{transform:rotate(-23deg)}to{transform:rotate(23deg)}}
-@keyframes armBack{from{transform:rotate(-22deg)}to{transform:rotate(22deg)}}
-@keyframes armFront{from{transform:rotate(22deg)}to{transform:rotate(-22deg)}}
-.wallpaper-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}
-.wallpaper-choice{position:relative;min-width:0;border:2px solid #314563;border-radius:13px;overflow:hidden;padding:0;background:#0b1425;color:#fff;text-align:left;cursor:pointer;transition:border-color .18s,transform .18s}
-.wallpaper-choice:hover{transform:translateY(-2px);border-color:#79aaff}
-.wallpaper-choice.selected{border-color:#f2bd55;box-shadow:0 0 0 2px #f2bd5540}
-.wallpaper-choice .wallpaper-thumb{display:block;width:100%;aspect-ratio:16/9;background-size:cover;background-position:center}
-.wallpaper-choice .wallpaper-name{display:block;padding:9px 11px;font-weight:700}
-.wallpaper-choice .selected-mark{position:absolute;right:8px;top:8px;background:#e9ad42;color:#151515;border-radius:20px;padding:4px 8px;font-size:11px;font-weight:700;display:none}
-.wallpaper-choice.selected .selected-mark{display:block}
-@media(max-width:560px){.wallpaper-gallery{gap:8px}.wallpaper-choice .wallpaper-name{padding:8px;font-size:13px}}
+#traveler{position:absolute;z-index:3;left:0;top:68%;font-size:clamp(34px,6vw,76px);filter:drop-shadow(0 3px 8px #000);display:none;pointer-events:none;will-change:transform}
 .screen-label{position:absolute;top:18px;left:0;right:0;text-align:center;color:#ffffff80;font-size:12px;letter-spacing:3px;pointer-events:none}
 #login{max-width:420px;margin:50px auto}
 #controller{padding-bottom:40px}
@@ -77,6 +57,28 @@ textarea{min-height:75px;resize:vertical}
 .style-card small{font-size:10px;line-height:1.35;color:var(--muted);font-weight:normal}
 .style-card.selected{border:2px solid #e9ad42;background:#1a2943;box-shadow:0 0 14px #e9ad4233}
 @media(max-width:600px){header h1{font-size:21px}.panel{padding:13px}main{width:94%}}
+
+.wallpaper-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+.wallpaper-card{border:2px solid var(--line);border-radius:12px;overflow:hidden;background:#0b1425;min-width:0}
+.wallpaper-card.active{border-color:var(--gold);box-shadow:0 0 0 2px #e9ad4233}
+.wallpaper-card img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.wallpaper-card .wallpaper-card-info{padding:9px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.wallpaper-card strong{font-size:13px;line-height:1.25}
+.wallpaper-card button{padding:8px 10px;white-space:nowrap;font-size:12px}
+@media(max-width:560px){.wallpaper-gallery{grid-template-columns:1fr 1fr;gap:7px}.wallpaper-card .wallpaper-card-info{align-items:stretch;flex-direction:column}.wallpaper-card button{width:100%}}
+#traveler{width:clamp(76px,9vw,112px);height:140px;font-size:0;display:none;pointer-events:none;will-change:transform}
+#traveler svg{width:100%;height:100%;overflow:visible;display:block}
+#traveler .santa-body{transform-box:fill-box;transform-origin:center;animation:santaBob .48s ease-in-out infinite alternate}
+#traveler .leg-back{transform-box:fill-box;transform-origin:top center;animation:legBack .48s ease-in-out infinite alternate}
+#traveler .leg-front{transform-box:fill-box;transform-origin:top center;animation:legFront .48s ease-in-out infinite alternate}
+#traveler .arm-back{transform-box:fill-box;transform-origin:top center;animation:armBack .48s ease-in-out infinite alternate}
+#traveler .arm-front{transform-box:fill-box;transform-origin:top center;animation:armFront .48s ease-in-out infinite alternate}
+@keyframes santaBob{from{transform:translateY(0) rotate(-1deg)}to{transform:translateY(-4px) rotate(1deg)}}
+@keyframes legBack{from{transform:rotate(23deg)}to{transform:rotate(-23deg)}}
+@keyframes legFront{from{transform:rotate(-23deg)}to{transform:rotate(23deg)}}
+@keyframes armBack{from{transform:rotate(-22deg)}to{transform:rotate(22deg)}}
+@keyframes armFront{from{transform:rotate(22deg)}to{transform:rotate(-22deg)}}
+
 </style>
 </head>
 <body>
@@ -183,14 +185,17 @@ textarea{min-height:75px;resize:vertical}
 <section class="panel">
 <h2>🎄 Kerstlandschap voor scherm 1 en 2</h2>
 <p class="small">Scherm 1 toont de linkerhelft en scherm 2 de rechterhelft. Schermen 3, 4 en 5 behouden hun effectenscherm zonder achtergrond.</p>
-<label>Kies een landschap</label>
+<label>Kies een landschap en druk op Selecteer</label>
 <div class="wallpaper-gallery" id="wallpaperGallery">
-<button type="button" class="wallpaper-choice selected" data-style="winterbos" aria-pressed="true"><span class="wallpaper-thumb" style="background-image:url('backgrounds/winterbos-left.jpg')"></span><span class="wallpaper-name">Winterbos</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="alpendorp" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('backgrounds/alpendorp-left.jpg')"></span><span class="wallpaper-name">Alpendorp</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="frozen-lake" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('backgrounds/frozen-lake-left.jpg')"></span><span class="wallpaper-name">Bevroren meer</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="moonlight" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('backgrounds/moonlight-left.jpg')"></span><span class="wallpaper-name">Moonlight</span><span class="selected-mark">✓ Gekozen</span></button>
+<div class="wallpaper-card" data-style="winterbos"><img src="backgrounds/winterbos-left.jpg" alt="Winterbos"><div class="wallpaper-card-info"><strong>Winterbos</strong><button type="button" class="secondary wallpaper-select">Selecteer</button></div></div>
+<div class="wallpaper-card" data-style="alpendorp"><img src="backgrounds/alpendorp-left.jpg" alt="Alpendorp"><div class="wallpaper-card-info"><strong>Alpendorp</strong><button type="button" class="secondary wallpaper-select">Selecteer</button></div></div>
+<div class="wallpaper-card" data-style="frozen-lake"><img src="backgrounds/frozen-lake-left.jpg" alt="Bevroren meer"><div class="wallpaper-card-info"><strong>Bevroren meer</strong><button type="button" class="secondary wallpaper-select">Selecteer</button></div></div>
+<div class="wallpaper-card" data-style="moonlight"><img src="backgrounds/moonlight-left.jpg" alt="Moonlight"><div class="wallpaper-card-info"><strong>Moonlight</strong><button type="button" class="secondary wallpaper-select">Selecteer</button></div></div>
+<div class="wallpaper-card" data-style="coca-cola-plein"><img src="backgrounds/coca-cola-plein-left.jpg" alt="Coca-Cola vrachtwagen en kerstplein"><div class="wallpaper-card-info"><strong>Coca-Cola & kerstplein</strong><button type="button" class="secondary wallpaper-select">Selecteer</button></div></div>
 </div>
-<select id="wallpaperStyle" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"><option value="winterbos">Winterbos</option><option value="alpendorp">Alpendorp</option><option value="frozen-lake">Bevroren meer</option><option value="moonlight">Moonlight</option></select>
+<select id="wallpaperStyle" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+<option value="winterbos">Winterbos</option><option value="alpendorp">Alpendorp</option><option value="frozen-lake">Bevroren meer</option><option value="moonlight">Moonlight</option><option value="coca-cola-plein">Coca-Cola & kerstplein</option>
+</select>
 <button id="applyWallpaper" class="primary" style="width:100%;margin-top:12px">ACHTERGROND TOEPASSEN</button>
 <div class="small" style="margin-top:10px">Zorg dat de map backgrounds naast index.html staat.</div>
 <div class="divider"></div>
@@ -242,13 +247,22 @@ textarea{min-height:75px;resize:vertical}
 
 <div id="screen" class="hidden">
 <div id="wallpaper"></div>
-<div id="traveler" aria-hidden="true"><svg viewBox="0 0 120 150" role="presentation"><g class="santa-body">
-<g class="leg-back"><path d="M53 105 L48 128" stroke="#202b42" stroke-width="11" stroke-linecap="round"/><path d="M48 128 Q39 132 36 138 Q35 142 42 142 L58 141 Q62 138 57 134 L54 128" fill="#241d25"/><path d="M43 133 L56 133" stroke="#fff" stroke-width="3"/></g>
-<g class="leg-front"><path d="M68 105 L73 128" stroke="#202b42" stroke-width="11" stroke-linecap="round"/><path d="M73 128 Q82 132 85 138 Q86 142 79 142 L63 141 Q59 138 64 134 L67 128" fill="#241d25"/><path d="M64 133 L81 133" stroke="#fff" stroke-width="3"/></g>
-<path d="M39 57 Q60 48 81 57 L88 111 Q61 122 32 111 Z" fill="#c91f35" stroke="#8c1427" stroke-width="2"/><path d="M54 54 L60 111 L68 111 L66 54" fill="#fff0dc"/><path d="M35 109 Q60 117 86 109 L88 117 Q60 127 32 117 Z" fill="#fff"/><circle cx="60" cy="75" r="3" fill="#e8b34d"/><circle cx="61" cy="91" r="3" fill="#e8b34d"/>
-<g class="arm-back"><path d="M39 64 Q27 75 24 91" fill="none" stroke="#c91f35" stroke-width="12" stroke-linecap="round"/><path d="M24 88 L22 97" stroke="#fff" stroke-width="12" stroke-linecap="round"/><circle cx="22" cy="101" r="7" fill="#f1c6a4"/></g><g class="arm-front"><path d="M80 64 Q93 76 96 90" fill="none" stroke="#c91f35" stroke-width="12" stroke-linecap="round"/><path d="M96 87 L98 96" stroke="#fff" stroke-width="12" stroke-linecap="round"/><circle cx="99" cy="100" r="7" fill="#f1c6a4"/></g>
-<circle cx="60" cy="38" r="24" fill="#f1c6a4"/><path d="M38 39 Q40 12 61 12 Q81 13 83 40 Q71 32 60 34 Q48 33 38 39" fill="#fff"/><path d="M37 27 Q56 7 78 22 L87 15 Q91 8 84 5 Q65 -1 45 11 Q34 16 37 27" fill="#c91f35"/><path d="M39 28 Q60 19 81 29" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="86" cy="8" r="8" fill="#fff"/><circle cx="51" cy="38" r="2.5" fill="#29202a"/><circle cx="69" cy="38" r="2.5" fill="#29202a"/><path d="M54 48 Q60 53 67 48" fill="none" stroke="#8d3d35" stroke-width="2" stroke-linecap="round"/><path d="M43 49 Q60 69 77 49 Q75 66 60 68 Q45 66 43 49" fill="#fff"/>
-</g></svg></div>
+<div id="traveler" aria-hidden="true">
+<svg viewBox="0 0 120 150" role="presentation">
+ <g class="santa-body">
+  <g class="leg-back"><path d="M53 105 L48 128" stroke="#202b42" stroke-width="11" stroke-linecap="round"/><path d="M48 128 Q39 132 36 138 Q35 142 42 142 L58 141 Q62 138 57 134 L54 128" fill="#241d25"/><path d="M43 133 L56 133" stroke="#fff" stroke-width="3"/></g>
+  <g class="leg-front"><path d="M68 105 L73 128" stroke="#202b42" stroke-width="11" stroke-linecap="round"/><path d="M73 128 Q82 132 85 138 Q86 142 79 142 L63 141 Q59 138 64 134 L67 128" fill="#241d25"/><path d="M64 133 L81 133" stroke="#fff" stroke-width="3"/></g>
+  <path d="M39 57 Q60 48 81 57 L88 111 Q61 122 32 111 Z" fill="#c91f35" stroke="#8c1427" stroke-width="2"/>
+  <path d="M54 54 L60 111 L68 111 L66 54" fill="#fff0dc"/><path d="M35 109 Q60 117 86 109 L88 117 Q60 127 32 117 Z" fill="#fff"/>
+  <circle cx="60" cy="75" r="3" fill="#e8b34d"/><circle cx="61" cy="91" r="3" fill="#e8b34d"/>
+  <g class="arm-back"><path d="M39 64 Q27 75 24 91" fill="none" stroke="#c91f35" stroke-width="12" stroke-linecap="round"/><path d="M24 88 L22 97" stroke="#fff" stroke-width="12" stroke-linecap="round"/><circle cx="22" cy="101" r="7" fill="#f1c6a4"/></g>
+  <g class="arm-front"><path d="M80 64 Q93 76 96 90" fill="none" stroke="#c91f35" stroke-width="12" stroke-linecap="round"/><path d="M96 87 L98 96" stroke="#fff" stroke-width="12" stroke-linecap="round"/><circle cx="99" cy="100" r="7" fill="#f1c6a4"/></g>
+  <circle cx="60" cy="38" r="24" fill="#f1c6a4"/><path d="M38 39 Q40 12 61 12 Q81 13 83 40 Q71 32 60 34 Q48 33 38 39" fill="#fff"/>
+  <path d="M37 27 Q56 7 78 22 L87 15 Q91 8 84 5 Q65 -1 45 11 Q34 16 37 27" fill="#c91f35"/><path d="M39 28 Q60 19 81 29" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="86" cy="8" r="8" fill="#fff"/>
+  <circle cx="51" cy="38" r="2.5" fill="#29202a"/><circle cx="69" cy="38" r="2.5" fill="#29202a"/><path d="M54 48 Q60 53 67 48" fill="none" stroke="#8d3d35" stroke-width="2" stroke-linecap="round"/><path d="M43 49 Q60 69 77 49 Q75 66 60 68 Q45 66 43 49" fill="#fff"/>
+ </g>
+</svg>
+</div>
 <canvas id="fireworks"></canvas>
 <div class="screen-label" id="screenLabel"></div>
 </div>
@@ -330,7 +344,7 @@ function applyWallpaper(style){
 }
 
 function animateSanta(){
- if(!isScreen||browserNumber>2||!santaStartAt){if(traveler)traveler.style.display="none";return;}
+ if(!isScreen||browserNumber>2||!santaStartAt){traveler.style.display="none";return;}
  const cycle=24000;
  const elapsed=((Date.now()-santaStartAt)%cycle+cycle)%cycle;
  const segment=elapsed<12000?1:2;
@@ -592,12 +606,15 @@ function setupController(){
  });
  document.getElementById("clearProjection").onclick=()=>sendCommand("clear-projection");
  document.getElementById("refreshScreens").onclick=()=>sendCommand("refresh");
- const wallpaperGallery=document.getElementById("wallpaperGallery");
-wallpaperGallery.querySelectorAll(".wallpaper-choice").forEach(choice=>choice.addEventListener("click",()=>{
- wallpaperGallery.querySelectorAll(".wallpaper-choice").forEach(item=>{const active=item===choice;item.classList.toggle("selected",active);item.setAttribute("aria-pressed",String(active));});
- document.getElementById("wallpaperStyle").value=choice.dataset.style;
-}));
-
+ document.querySelectorAll("#wallpaperGallery .wallpaper-select").forEach(button=>{
+ button.addEventListener("click",()=>{
+  const card=button.closest(".wallpaper-card");
+  document.querySelectorAll("#wallpaperGallery .wallpaper-card").forEach(item=>item.classList.remove("active"));
+  card.classList.add("active");
+  document.getElementById("wallpaperStyle").value=card.dataset.style;
+  setStatus("Geselecteerd: "+card.querySelector("strong").textContent+". Druk op ACHTERGROND TOEPASSEN om scherm 1 en 2 bij te werken.");
+ });
+});
 document.getElementById("applyWallpaper").onclick=async()=>{
   const style=document.getElementById("wallpaperStyle").value;
   try{
@@ -638,13 +655,7 @@ function initScreen(){
  document.body.innerHTML=`
  <div id="screen">
   <div id="wallpaper"></div>
-  <div id="traveler" aria-hidden="true"><svg viewBox="0 0 120 150" role="presentation"><g class="santa-body">
-<g class="leg-back"><path d="M53 105 L48 128" stroke="#202b42" stroke-width="11" stroke-linecap="round"/><path d="M48 128 Q39 132 36 138 Q35 142 42 142 L58 141 Q62 138 57 134 L54 128" fill="#241d25"/><path d="M43 133 L56 133" stroke="#fff" stroke-width="3"/></g>
-<g class="leg-front"><path d="M68 105 L73 128" stroke="#202b42" stroke-width="11" stroke-linecap="round"/><path d="M73 128 Q82 132 85 138 Q86 142 79 142 L63 141 Q59 138 64 134 L67 128" fill="#241d25"/><path d="M64 133 L81 133" stroke="#fff" stroke-width="3"/></g>
-<path d="M39 57 Q60 48 81 57 L88 111 Q61 122 32 111 Z" fill="#c91f35" stroke="#8c1427" stroke-width="2"/><path d="M54 54 L60 111 L68 111 L66 54" fill="#fff0dc"/><path d="M35 109 Q60 117 86 109 L88 117 Q60 127 32 117 Z" fill="#fff"/><circle cx="60" cy="75" r="3" fill="#e8b34d"/><circle cx="61" cy="91" r="3" fill="#e8b34d"/>
-<g class="arm-back"><path d="M39 64 Q27 75 24 91" fill="none" stroke="#c91f35" stroke-width="12" stroke-linecap="round"/><path d="M24 88 L22 97" stroke="#fff" stroke-width="12" stroke-linecap="round"/><circle cx="22" cy="101" r="7" fill="#f1c6a4"/></g><g class="arm-front"><path d="M80 64 Q93 76 96 90" fill="none" stroke="#c91f35" stroke-width="12" stroke-linecap="round"/><path d="M96 87 L98 96" stroke="#fff" stroke-width="12" stroke-linecap="round"/><circle cx="99" cy="100" r="7" fill="#f1c6a4"/></g>
-<circle cx="60" cy="38" r="24" fill="#f1c6a4"/><path d="M38 39 Q40 12 61 12 Q81 13 83 40 Q71 32 60 34 Q48 33 38 39" fill="#fff"/><path d="M37 27 Q56 7 78 22 L87 15 Q91 8 84 5 Q65 -1 45 11 Q34 16 37 27" fill="#c91f35"/><path d="M39 28 Q60 19 81 29" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="86" cy="8" r="8" fill="#fff"/><circle cx="51" cy="38" r="2.5" fill="#29202a"/><circle cx="69" cy="38" r="2.5" fill="#29202a"/><path d="M54 48 Q60 53 67 48" fill="none" stroke="#8d3d35" stroke-width="2" stroke-linecap="round"/><path d="M43 49 Q60 69 77 49 Q75 66 60 68 Q45 66 43 49" fill="#fff"/>
-</g></svg></div>
+  <div id="traveler">🎅</div>
   <canvas id="fireworks"></canvas>
   <div class="screen-label" id="screenLabel"></div>
  </div>`;
