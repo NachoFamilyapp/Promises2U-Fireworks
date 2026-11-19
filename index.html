@@ -57,16 +57,6 @@ textarea{min-height:75px;resize:vertical}
 .style-card small{font-size:10px;line-height:1.35;color:var(--muted);font-weight:normal}
 .style-card.selected{border:2px solid #e9ad42;background:#1a2943;box-shadow:0 0 14px #e9ad4233}
 @media(max-width:600px){header h1{font-size:21px}.panel{padding:13px}main{width:94%}}
-
-.wallpaper-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
-.wallpaper-card{overflow:hidden;border:2px solid var(--line);border-radius:12px;background:#0b1425;min-width:0}
-.wallpaper-card.active{border-color:var(--gold);box-shadow:0 0 0 2px #e9ad4233}
-.wallpaper-card img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#17294a}
-.wallpaper-card-footer{padding:9px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.wallpaper-card-footer strong{font-size:13px}
-.wallpaper-card-footer button{padding:8px 11px;font-size:12px}
-@media(max-width:560px){.wallpaper-gallery{gap:7px}.wallpaper-card-footer{align-items:stretch;flex-direction:column}.wallpaper-card-footer button{width:100%}}
-
 </style>
 </head>
 <body>
@@ -173,17 +163,18 @@ textarea{min-height:75px;resize:vertical}
 <section class="panel">
 <h2>🎄 Kerstlandschap voor scherm 1 en 2</h2>
 <p class="small">Scherm 1 toont de linkerhelft en scherm 2 de rechterhelft. Schermen 3, 4 en 5 behouden hun effectenscherm zonder achtergrond.</p>
-<label>Kies een landschap en druk op Selecteer</label>
-<div class="wallpaper-gallery" id="wallpaperGallery">
- <div class="wallpaper-card" data-style="winterbos"><img src="backgrounds/winterbos-left.jpg" alt="Winterbos"><div class="wallpaper-card-footer"><strong>Winterbos</strong><button type="button" class="secondary wallpaper-select">Selecteer</button></div></div>
- <div class="wallpaper-card" data-style="alpendorp"><img src="backgrounds/alpendorp-left.jpg" alt="Alpendorp"><div class="wallpaper-card-footer"><strong>Alpendorp</strong><button type="button" class="secondary wallpaper-select">Selecteer</button></div></div>
- <div class="wallpaper-card" data-style="frozen-lake"><img src="backgrounds/frozen-lake-left.jpg" alt="Bevroren meer"><div class="wallpaper-card-footer"><strong>Bevroren meer</strong><button type="button" class="secondary wallpaper-select">Selecteer</button></div></div>
- <div class="wallpaper-card" data-style="moonlight"><img src="backgrounds/moonlight-left.jpg" alt="Moonlight"><div class="wallpaper-card-footer"><strong>Moonlight</strong><button type="button" class="secondary wallpaper-select">Selecteer</button></div></div>
- <div class="wallpaper-card" data-style="coca-cola-plein"><img src="backgrounds/coca-cola-plein-left.jpg" alt="Coca-Cola vrachtwagen en kerstplein"><div class="wallpaper-card-footer"><strong>Coca-Cola & kerstplein</strong><button type="button" class="secondary wallpaper-select">Selecteer</button></div></div>
-</div>
-<select id="wallpaperStyle" aria-label="Geselecteerde achtergrond" style="width:100%">
-<option value="winterbos">Winterbos</option><option value="alpendorp">Alpendorp</option><option value="frozen-lake">Bevroren meer</option><option value="moonlight">Moonlight</option><option value="coca-cola-plein">Coca-Cola & kerstplein</option>
+<label>Kies het landschap</label>
+<select id="wallpaperStyle">
+<option value="winterbos">Winterbos</option>
+<option value="alpendorp">Alpendorp</option>
+<option value="frozen-lake">Bevroren meer</option>
+<option value="moonlight">Moonlight</option>
+<option value="coca-cola-plein">Coca-Cola &amp; kerstplein</option>
 </select>
+<div id="wallpaperPreviewWrap" class="small" style="margin-top:10px">
+<img id="wallpaperPreview" src="backgrounds/winterbos-left.jpg" alt="Voorbeeld gekozen achtergrond" style="display:block;width:100%;max-height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--line);margin-top:6px">
+<span id="wallpaperPreviewLabel">Voorbeeld: Winterbos</span>
+</div>
 <button id="applyWallpaper" class="primary" style="width:100%;margin-top:12px">ACHTERGROND TOEPASSEN</button>
 <div class="small" style="margin-top:10px">Zorg dat de map backgrounds naast index.html staat.</div>
 <div class="divider"></div>
@@ -312,21 +303,22 @@ async function applyWallpaper(style){
  if(!isScreen||browserNumber>2)return;
  const pair=wallpaperFiles[style]||wallpaperFiles.winterbos;
  const file=pair[browserNumber-1];
- if(!file)return;
- const imageUrl=file+"?v=20261119";
- const testImage=new Image();
- testImage.src=imageUrl;
- try{
-  await testImage.decode();
+ const imageUrl=file+"?v=20261119-2";
+ const preload=new Image();
+ preload.onload=()=>{
   wallpaper.style.backgroundImage=`url("${imageUrl}")`;
+  wallpaper.style.backgroundPosition="center center";
   wallpaper.style.backgroundSize="cover";
-  wallpaper.style.backgroundPosition="center";
+  wallpaper.style.backgroundRepeat="no-repeat";
   wallpaper.style.display="block";
   wallpaperStyle=style;
- }catch(error){
-  console.error("Achtergrond kan niet worden geladen:",imageUrl,error);
-  wallpaper.style.display="none";
- }
+ };
+ preload.onerror=()=>{
+  console.error("Achtergrond niet gevonden of niet te laden:",file);
+  wallpaper.style.backgroundImage="none";
+  wallpaper.style.display="block";
+ };
+ preload.src=imageUrl;
 }
 
 function animateSanta(){
@@ -597,32 +589,37 @@ function setupController(){
  });
  document.getElementById("clearProjection").onclick=()=>sendCommand("clear-projection");
  document.getElementById("refreshScreens").onclick=()=>sendCommand("refresh");
- document.querySelectorAll("#wallpaperGallery .wallpaper-select").forEach(button=>{
-  button.addEventListener("click",()=>{
-   const card=button.closest(".wallpaper-card");
-   document.querySelectorAll("#wallpaperGallery .wallpaper-card").forEach(item=>item.classList.remove("active"));
-   card.classList.add("active");
-   document.getElementById("wallpaperStyle").value=card.dataset.style;
-   setStatus("Geselecteerd: "+card.querySelector("strong").textContent+". Klik op ACHTERGROND TOEPASSEN.");
-  });
- });
+ const wallpaperSelect=document.getElementById("wallpaperStyle");
+ const wallpaperPreview=document.getElementById("wallpaperPreview");
+ const wallpaperPreviewLabel=document.getElementById("wallpaperPreviewLabel");
+ function updateWallpaperPreview(){
+  const style=wallpaperSelect.value;
+  const pair=wallpaperFiles[style]||wallpaperFiles.winterbos;
+  const label=wallpaperSelect.options[wallpaperSelect.selectedIndex].text;
+  wallpaperPreview.src=pair[0]+"?v=20261119-2";
+  wallpaperPreview.alt="Voorbeeld: "+label;
+  wallpaperPreviewLabel.textContent="Voorbeeld scherm 1: "+label;
+ }
+ wallpaperSelect.addEventListener("change",updateWallpaperPreview);
+ updateWallpaperPreview();
  document.getElementById("applyWallpaper").onclick=async()=>{
-  const style=document.getElementById("wallpaperStyle").value;
+  const style=wallpaperSelect.value;
   const pair=wallpaperFiles[style];
-  if(!pair){setStatus("Achtergrond niet gevonden in de instellingen.");return;}
+  if(!pair){setStatus("Achtergrondfout: deze achtergrond is niet geregistreerd.");return;}
   try{
-   setStatus("Afbeeldingen controleren...");
-   await Promise.all(pair.map(path=>new Promise((resolve,reject)=>{
+   const checks=await Promise.all(pair.map(url=>new Promise(resolve=>{
     const image=new Image();
-    image.onload=()=>resolve(path);
-    image.onerror=()=>reject(new Error("Bestand niet gevonden: "+path));
-    image.src=path+"?v=20261119";
+    image.onload=()=>resolve(true);
+    image.onerror=()=>resolve(false);
+    image.src=url+"?v=20261119-2";
    })));
+   if(!checks[0]||!checks[1]){
+    setStatus("Achtergrond niet toegepast: "+(!checks[0]?pair[0]:pair[1])+" ontbreekt of kan niet worden geladen.");
+    return;
+   }
    await set(ref(db,"settings/wallpaperStyle"),style);
-   setStatus("Achtergrond toegepast op scherm 1 en 2: "+style);
-  }catch(e){
-   setStatus("Achtergrond niet toegepast. Controleer de twee JPG-bestanden in backgrounds/. "+e.message);
-  }
+   setStatus("Achtergrond toegepast op scherm 1 en 2: "+wallpaperSelect.options[wallpaperSelect.selectedIndex].text);
+  }catch(e){setStatus("Achtergrondfout: "+e.message);}
  };
  document.getElementById("startSanta").onclick=async()=>{
   try{
