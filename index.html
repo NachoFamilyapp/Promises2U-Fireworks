@@ -57,6 +57,33 @@ textarea{min-height:75px;resize:vertical}
 .style-card small{font-size:10px;line-height:1.35;color:var(--muted);font-weight:normal}
 .style-card.selected{border:2px solid #e9ad42;background:#1a2943;box-shadow:0 0 14px #e9ad4233}
 @media(max-width:600px){header h1{font-size:21px}.panel{padding:13px}main{width:94%}}
+
+/* Luxe playful controller refresh */
+:root{--bg:#090d1d;--panel:#141d35;--line:#344363;--text:#f5f7ff;--muted:#b6c3dc;--blue:#657cff;--gold:#f5c76a;--pink:#ff78b7;--mint:#75e2ca}
+body{background:radial-gradient(ellipse at 12% -10%,#394878 0,transparent 42%),radial-gradient(ellipse at 100% 0,#4a285e 0,transparent 35%),linear-gradient(145deg,#080d1c,#10172b 58%,#17152a)}
+header{position:relative;overflow:hidden;background:linear-gradient(110deg,#18294bdf,#35234ad9);border-bottom:1px solid #ffffff24;backdrop-filter:blur(14px)}
+header:after{content:"✦  ✧  ✦";position:absolute;right:5%;top:18px;color:#f5c76a66;font-size:30px;letter-spacing:12px;pointer-events:none}
+header h1{font-size:clamp(23px,4vw,34px);letter-spacing:1px;background:linear-gradient(90deg,#fff,#f5c76a,#ff9fca);-webkit-background-clip:text;background-clip:text;color:transparent}
+header p{font-size:13px;letter-spacing:.4px}
+.panel{background:linear-gradient(145deg,rgba(26,38,67,.97),rgba(16,24,44,.98));border:1px solid #ffffff20;border-radius:20px;box-shadow:0 18px 45px #02061180, inset 0 1px #ffffff0b}
+.panel h2{font-size:19px;letter-spacing:.2px}
+button{border-radius:12px;transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
+button:hover{transform:translateY(-1px);box-shadow:0 7px 18px #0004}
+button.primary,.primary{background:linear-gradient(110deg,#627bff,#a16bff 60%,#e878b4);box-shadow:0 7px 20px #735bff40}
+.wallpaper-picker-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0}
+.wallpaper-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.wallpaper-card{position:relative;overflow:hidden;border:1px solid #ffffff24;border-radius:16px;background:#0c1428;min-width:0;transition:.18s ease}
+.wallpaper-card.selected{border:2px solid var(--gold);box-shadow:0 0 0 3px #f5c76a24,0 12px 26px #0005}
+.wallpaper-card img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:linear-gradient(135deg,#26395b,#111a2d)}
+.wallpaper-card .wallpaper-card-meta{padding:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wallpaper-card strong{font-size:13px;line-height:1.3}
+.wallpaper-card .wallpaper-select{padding:8px 11px;font-size:12px;background:#293c61;border:1px solid #ffffff20;white-space:nowrap}
+.wallpaper-card.selected .wallpaper-select{background:linear-gradient(110deg,#e7b95b,#f08bb4);color:#171321}
+.wallpaper-empty{padding:18px;border:1px dashed #7585a8;border-radius:14px;color:var(--muted);grid-column:1/-1;text-align:center}
+.wallpaper-subtitle{color:var(--muted);font-size:12px;line-height:1.5;margin:4px 0 10px}
+.wallpaper-count{font-size:11px;color:var(--mint);background:#75e2ca16;border:1px solid #75e2ca35;border-radius:99px;padding:6px 10px}
+@media(max-width:600px){.wallpaper-gallery{gap:8px}.wallpaper-card .wallpaper-card-meta{align-items:stretch;flex-direction:column}.wallpaper-card .wallpaper-select{width:100%}header:after{display:none}}
+
 </style>
 </head>
 <body>
@@ -163,20 +190,16 @@ textarea{min-height:75px;resize:vertical}
 <section class="panel">
 <h2>🎄 Kerstlandschap voor scherm 1 en 2</h2>
 <p class="small">Scherm 1 toont de linkerhelft en scherm 2 de rechterhelft. Schermen 3, 4 en 5 behouden hun effectenscherm zonder achtergrond.</p>
-<label>Kies het landschap</label>
-<select id="wallpaperStyle">
-<option value="winterbos">Winterbos</option>
-<option value="alpendorp">Alpendorp</option>
-<option value="frozen-lake">Bevroren meer</option>
-<option value="moonlight">Moonlight</option>
-<option value="coca-cola-plein">Coca-Cola &amp; kerstplein</option>
-</select>
-<div id="wallpaperPreviewWrap" class="small" style="margin-top:10px">
-<img id="wallpaperPreview" src="backgrounds/winterbos-left.jpg" alt="Voorbeeld gekozen achtergrond" style="display:block;width:100%;max-height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--line);margin-top:6px">
-<span id="wallpaperPreviewLabel">Voorbeeld: Winterbos</span>
+<div class="wallpaper-picker-head">
+ <div><label>Jouw winterwerelden</label><div class="wallpaper-subtitle">Afbeeldingen uit GitHub worden automatisch ingelezen. Kies een kaart en pas hem toe op scherm 1 en 2.</div></div>
+ <span class="wallpaper-count" id="wallpaperCount">Achtergronden laden…</span>
 </div>
-<button id="applyWallpaper" class="primary" style="width:100%;margin-top:12px">ACHTERGROND TOEPASSEN</button>
-<div class="small" style="margin-top:10px">Zorg dat de map backgrounds naast index.html staat.</div>
+<div id="wallpaperGallery" class="wallpaper-gallery"><div class="wallpaper-empty">De achtergronden worden opgehaald uit GitHub…</div></div>
+<select id="wallpaperStyle" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+ <option value="winterbos">Winterbos</option>
+</select>
+<button id="applyWallpaper" class="primary" style="width:100%;margin-top:14px">✨ ACHTERGROND TOEPASSEN OP SCHERM 1 + 2</button>
+<div class="small" id="wallpaperHelp" style="margin-top:10px">De controller leest automatisch alle bestanden met -left en -right in de map backgrounds/.</div>
 <div class="divider"></div>
 <h3>🎅 Kerstman over de twee schermen</h3>
 <p class="small">Start de Kerstman op scherm 1. De animatie loopt daarna door naar scherm 2.</p>
@@ -280,9 +303,40 @@ const wallpaperFiles={
  winterbos:["backgrounds/winterbos-left.jpg","backgrounds/winterbos-right.jpg"],
  alpendorp:["backgrounds/alpendorp-left.jpg","backgrounds/alpendorp-right.jpg"],
  "frozen-lake":["backgrounds/frozen-lake-left.jpg","backgrounds/frozen-lake-right.jpg"],
- moonlight:["backgrounds/moonlight-left.jpg","backgrounds/moonlight-right.jpg"],
- "coca-cola-plein":["backgrounds/coca-cola-plein-left.jpg","backgrounds/coca-cola-plein-right.jpg"]
+ moonlight:["backgrounds/moonlight-left.jpg","backgrounds/moonlight-right.jpg"]
 };
+const GITHUB_BACKGROUND_API="https://api.github.com/repos/NachoFamilyapp/Promises2U-Fireworks/contents/backgrounds?ref=main";
+const GITHUB_RAW_BASE="https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/";
+let backgroundCatalog=[];
+let backgroundCatalogPromise=null;
+function backgroundLabel(slug){
+ const known={"winterbos":"Winterbos","alpendorp":"Alpendorp","frozen-lake":"Bevroren meer","moonlight":"Moonlight","coca-cola-plein":"Coca-Cola & kerstplein"};
+ return known[slug]||slug.split("-").map(x=>x.charAt(0).toUpperCase()+x.slice(1)).join(" ");
+}
+async function loadBackgroundCatalog(force=false){
+ if(backgroundCatalogPromise&&!force)return backgroundCatalogPromise;
+ backgroundCatalogPromise=(async()=>{
+  const response=await fetch(GITHUB_BACKGROUND_API,{cache:"no-store",headers:{"Accept":"application/vnd.github+json"}});
+  if(!response.ok)throw new Error("GitHub gaf status "+response.status);
+  const files=await response.json();
+  const names=new Set(files.filter(x=>x.type==="file").map(x=>x.name));
+  const slugs=[...new Set([...names].map(name=>{
+   const m=name.match(/^(.+)-(left|right)\.(jpg|jpeg|png|webp)$/i);
+   return m?m[1]:null;
+  }).filter(Boolean))].filter(slug=>
+   [...names].some(n=>new RegExp("^"+slug.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"-left\\.(jpg|jpeg|png|webp)$","i").test(n)) &&
+   [...names].some(n=>new RegExp("^"+slug.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"-right\\.(jpg|jpeg|png|webp)$","i").test(n))
+  ).sort((a,b)=>a.localeCompare(b));
+  backgroundCatalog=slugs.map(slug=>{
+   const left=[...names].find(n=>new RegExp("^"+slug.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"-left\\.(jpg|jpeg|png|webp)$","i").test(n));
+   const right=[...names].find(n=>new RegExp("^"+slug.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"-right\\.(jpg|jpeg|png|webp)$","i").test(n));
+   return {slug,label:backgroundLabel(slug),left:GITHUB_RAW_BASE+encodeURIComponent(left),right:GITHUB_RAW_BASE+encodeURIComponent(right)};
+  });
+  backgroundCatalog.forEach(item=>wallpaperFiles[item.slug]=[item.left,item.right]);
+  return backgroundCatalog;
+ })();
+ return backgroundCatalogPromise;
+}
 
 function setStatus(message){
  const el=document.getElementById("controllerStatus");
@@ -301,24 +355,25 @@ resizeCanvas();
 
 async function applyWallpaper(style){
  if(!isScreen||browserNumber>2)return;
- const pair=wallpaperFiles[style]||wallpaperFiles.winterbos;
- const file=pair[browserNumber-1];
- const imageUrl=file+"?v=20261119-2";
- const preload=new Image();
- preload.onload=()=>{
-  wallpaper.style.backgroundImage=`url("${imageUrl}")`;
+ try{
+  await loadBackgroundCatalog();
+  const pair=wallpaperFiles[style]||wallpaperFiles.winterbos;
+  const file=pair[browserNumber-1];
+  if(!file)throw new Error("Geen afbeelding voor scherm "+browserNumber);
+  const url=file+(file.includes("?")?"&":"?")+"v="+Date.now();
+  const probe=new Image();
+  await new Promise((resolve,reject)=>{probe.onload=resolve;probe.onerror=()=>reject(new Error("Afbeelding niet gevonden: "+file));probe.src=url;});
+  wallpaper.style.backgroundImage=`url("${url}")`;
   wallpaper.style.backgroundPosition="center center";
   wallpaper.style.backgroundSize="cover";
   wallpaper.style.backgroundRepeat="no-repeat";
   wallpaper.style.display="block";
   wallpaperStyle=style;
- };
- preload.onerror=()=>{
-  console.error("Achtergrond niet gevonden of niet te laden:",file);
-  wallpaper.style.backgroundImage="none";
-  wallpaper.style.display="block";
- };
- preload.src=imageUrl;
+ }catch(error){
+  console.error("Achtergrond laden mislukt",error);
+  const el=document.getElementById("screenLabel");
+  if(el)el.textContent="Achtergrond laden mislukt: "+error.message;
+ }
 }
 
 function animateSanta(){
@@ -590,36 +645,58 @@ function setupController(){
  document.getElementById("clearProjection").onclick=()=>sendCommand("clear-projection");
  document.getElementById("refreshScreens").onclick=()=>sendCommand("refresh");
  const wallpaperSelect=document.getElementById("wallpaperStyle");
- const wallpaperPreview=document.getElementById("wallpaperPreview");
- const wallpaperPreviewLabel=document.getElementById("wallpaperPreviewLabel");
- function updateWallpaperPreview(){
-  const style=wallpaperSelect.value;
-  const pair=wallpaperFiles[style]||wallpaperFiles.winterbos;
-  const label=wallpaperSelect.options[wallpaperSelect.selectedIndex].text;
-  wallpaperPreview.src=pair[0]+"?v=20261119-2";
-  wallpaperPreview.alt="Voorbeeld: "+label;
-  wallpaperPreviewLabel.textContent="Voorbeeld scherm 1: "+label;
+ const wallpaperGallery=document.getElementById("wallpaperGallery");
+ const wallpaperCount=document.getElementById("wallpaperCount");
+ let selectedWallpaper="winterbos";
+ function renderWallpaperGallery(items){
+  wallpaperGallery.innerHTML="";
+  if(!items.length){wallpaperGallery.innerHTML='<div class="wallpaper-empty">Geen complete achtergrondparen gevonden. Upload per achtergrond een bestand met -left en -right in de map backgrounds/.</div>';wallpaperCount.textContent="0 achtergronden";return;}
+  wallpaperCount.textContent=items.length+" achtergronden";
+  items.forEach(item=>{
+   const card=document.createElement("article");
+   card.className="wallpaper-card"+(item.slug===selectedWallpaper?" selected":"");
+   const img=document.createElement("img");img.src=item.left+"?preview=1";img.alt=item.label;img.loading="lazy";
+   const meta=document.createElement("div");meta.className="wallpaper-card-meta";
+   const title=document.createElement("strong");title.textContent=item.label;
+   const btn=document.createElement("button");btn.type="button";btn.className="wallpaper-select";btn.textContent=item.slug===selectedWallpaper?"✓ Geselecteerd":"Selecteer";
+   btn.addEventListener("click",()=>{
+    selectedWallpaper=item.slug;wallpaperSelect.value=item.slug;
+    renderWallpaperGallery(backgroundCatalog);
+    setStatus(item.label+" geselecteerd. Druk op 'Achtergrond toepassen' om scherm 1 en 2 bij te werken.");
+   });
+   img.onerror=()=>{img.alt="Voorbeeld niet beschikbaar: "+item.label;img.style.opacity=".25";};
+   meta.append(title,btn);card.append(img,meta);wallpaperGallery.append(card);
+  });
  }
- wallpaperSelect.addEventListener("change",updateWallpaperPreview);
- updateWallpaperPreview();
- document.getElementById("applyWallpaper").onclick=async()=>{
-  const style=wallpaperSelect.value;
-  const pair=wallpaperFiles[style];
-  if(!pair){setStatus("Achtergrondfout: deze achtergrond is niet geregistreerd.");return;}
+ async function refreshWallpaperGallery(){
+  wallpaperCount.textContent="Laden…";
   try{
-   const checks=await Promise.all(pair.map(url=>new Promise(resolve=>{
-    const image=new Image();
-    image.onload=()=>resolve(true);
-    image.onerror=()=>resolve(false);
-    image.src=url+"?v=20261119-2";
+   const items=await loadBackgroundCatalog(true);
+   if(!items.some(x=>x.slug===selectedWallpaper))selectedWallpaper=items[0]?.slug||"winterbos";
+   wallpaperSelect.innerHTML="";
+   items.forEach(item=>{const option=document.createElement("option");option.value=item.slug;option.textContent=item.label;wallpaperSelect.append(option);});
+   wallpaperSelect.value=selectedWallpaper;
+   renderWallpaperGallery(items);
+   setStatus(items.length+" achtergronden automatisch ingelezen uit GitHub.");
+  }catch(error){
+   wallpaperCount.textContent="Laden mislukt";
+   wallpaperGallery.innerHTML='<div class="wallpaper-empty">GitHub-afbeeldingen konden niet worden opgehaald. Controleer of de repository openbaar is en probeer opnieuw. ('+error.message+')</div>';
+   setStatus("Achtergronden laden mislukt: "+error.message);
+  }
+ }
+ refreshWallpaperGallery();
+ document.getElementById("applyWallpaper").onclick=async()=>{
+  const style=selectedWallpaper||wallpaperSelect.value;
+  const item=backgroundCatalog.find(x=>x.slug===style);
+  if(!item){setStatus("Selecteer eerst een complete achtergrond.");return;}
+  try{
+   setStatus("Afbeeldingen controleren…");
+   await Promise.all([item.left,item.right].map(url=>new Promise((resolve,reject)=>{
+    const image=new Image();image.onload=resolve;image.onerror=()=>reject(new Error("Niet gevonden: "+url));image.src=url+"?check="+Date.now();
    })));
-   if(!checks[0]||!checks[1]){
-    setStatus("Achtergrond niet toegepast: "+(!checks[0]?pair[0]:pair[1])+" ontbreekt of kan niet worden geladen.");
-    return;
-   }
    await set(ref(db,"settings/wallpaperStyle"),style);
-   setStatus("Achtergrond toegepast op scherm 1 en 2: "+wallpaperSelect.options[wallpaperSelect.selectedIndex].text);
-  }catch(e){setStatus("Achtergrondfout: "+e.message);}
+   setStatus(item.label+" toegepast op scherm 1 en 2.");
+  }catch(e){setStatus("Niet toegepast: "+e.message);}
  };
  document.getElementById("startSanta").onclick=async()=>{
   try{
