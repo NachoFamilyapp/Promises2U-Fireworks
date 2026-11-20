@@ -185,11 +185,11 @@ textarea{min-height:75px;resize:vertical}
 <p class="small">Scherm 1 toont de linkerhelft en scherm 2 de rechterhelft. Schermen 3, 4 en 5 behouden hun effectenscherm zonder achtergrond.</p>
 <label>Kies een landschap</label>
 <div class="wallpaper-gallery" id="wallpaperGallery">
-<button type="button" class="wallpaper-choice selected" data-style="winterbos" aria-pressed="true"><span class="wallpaper-thumb" style="background-image:url('backgrounds/winterbos-left.jpg')"></span><span class="wallpaper-name">Winterbos</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="alpendorp" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('backgrounds/alpendorp-left.jpg')"></span><span class="wallpaper-name">Alpendorp</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="frozen-lake" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('backgrounds/frozen-lake-left.jpg')"></span><span class="wallpaper-name">Bevroren meer</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="moonlight" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('backgrounds/moonlight-left.jpg')"></span><span class="wallpaper-name">Moonlight</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="coca-cola-plein" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('backgrounds/coca-cola-plein-left.jpg')"></span><span class="wallpaper-name">Coca-Cola kerstplein</span><span class="selected-mark">✓ Gekozen</span></button>
+<button type="button" class="wallpaper-choice selected" data-style="winterbos" aria-pressed="true"><span class="wallpaper-thumb" style="background-image:url('https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/winterbos-left.jpg?v=20261120')"></span><span class="wallpaper-name">Winterbos</span><span class="selected-mark">✓ Gekozen</span></button>
+<button type="button" class="wallpaper-choice" data-style="alpendorp" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/alpendorp-left.jpg?v=20261120')"></span><span class="wallpaper-name">Alpendorp</span><span class="selected-mark">✓ Gekozen</span></button>
+<button type="button" class="wallpaper-choice" data-style="frozen-lake" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/frozen-lake-left.jpg?v=20261120')"></span><span class="wallpaper-name">Bevroren meer</span><span class="selected-mark">✓ Gekozen</span></button>
+<button type="button" class="wallpaper-choice" data-style="moonlight" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/moonlight-left.jpg?v=20261120')"></span><span class="wallpaper-name">Moonlight</span><span class="selected-mark">✓ Gekozen</span></button>
+<button type="button" class="wallpaper-choice" data-style="coca-cola-plein" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/coca-cola-plein-left.jpg?v=20261120')"></span><span class="wallpaper-name">Coca-Cola kerstplein</span><span class="selected-mark">✓ Gekozen</span></button>
 </div>
 <select id="wallpaperStyle" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"><option value="winterbos">Winterbos</option><option value="alpendorp">Alpendorp</option><option value="frozen-lake">Bevroren meer</option><option value="moonlight">Moonlight</option><option value="coca-cola-plein">Coca-Cola kerstplein</option></select>
 <button id="applyWallpaper" class="primary" style="width:100%;margin-top:12px">ACHTERGROND TOEPASSEN</button>
@@ -300,11 +300,11 @@ let lastCommandId="";
 let screenSettings={};
 
 const wallpaperFiles={
- winterbos:["backgrounds/winterbos-left.jpg","backgrounds/winterbos-right.jpg"],
- alpendorp:["backgrounds/alpendorp-left.jpg","backgrounds/alpendorp-right.jpg"],
- "frozen-lake":["backgrounds/frozen-lake-left.jpg","backgrounds/frozen-lake-right.jpg"],
- moonlight:["backgrounds/moonlight-left.jpg","backgrounds/moonlight-right.jpg"],
- "coca-cola-plein":["backgrounds/coca-cola-plein-left.jpg","backgrounds/coca-cola-plein-right.jpg"]
+ winterbos:["https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/winterbos-left.jpg?v=20261120","https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/winterbos-right.jpg?v=20261120"],
+ alpendorp:["https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/alpendorp-left.jpg?v=20261120","https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/alpendorp-right.jpg?v=20261120"],
+ "frozen-lake":["https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/frozen-lake-left.jpg?v=20261120","https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/frozen-lake-right.jpg?v=20261120"],
+ moonlight:["https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/moonlight-left.jpg?v=20261120","https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/moonlight-right.jpg?v=20261120"],
+ "coca-cola-plein":["https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/coca-cola-plein-left.jpg?v=20261120","https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/coca-cola-plein-right.jpg?v=20261120"]
 };
 
 function setStatus(message){
@@ -326,9 +326,19 @@ function applyWallpaper(style){
  if(!isScreen||browserNumber>2)return;
  const pair=wallpaperFiles[style]||wallpaperFiles.winterbos;
  const file=pair[browserNumber-1];
- wallpaper.style.backgroundImage=`url("${file}")`;
- wallpaper.style.display="block";
- wallpaperStyle=style;
+ if(!file){console.error("Geen achtergrondbestand voor scherm",browserNumber,style);return;}
+ // Preload eerst de afbeelding. Zo tonen we geen lege achtergrond als een URL niet bereikbaar is.
+ const image=new Image();
+ image.onload=()=>{
+  wallpaper.style.backgroundImage=`url("${file}")`;
+  wallpaper.style.backgroundSize="cover";
+  wallpaper.style.backgroundPosition="center center";
+  wallpaper.style.backgroundRepeat="no-repeat";
+  wallpaper.style.display="block";
+  wallpaperStyle=style;
+ };
+ image.onerror=()=>console.error("Achtergrond kon niet worden geladen:",file);
+ image.src=file;
 }
 
 function animateSanta(){
