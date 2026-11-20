@@ -42,27 +42,7 @@ textarea{min-height:75px;resize:vertical}
 #screen{position:fixed;inset:0;background:#080817;overflow:hidden}
 #wallpaper{position:absolute;inset:0;background:#080817 center/cover no-repeat;display:none}
 #fireworks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-#traveler{position:absolute;z-index:3;left:0;top:68%;width:clamp(76px,10vw,118px);height:auto;display:none;pointer-events:none;will-change:transform;filter:drop-shadow(0 5px 8px #000)}
-#traveler svg{display:block;width:100%;height:auto;overflow:visible}
-#traveler .santa-body{transform-box:fill-box;transform-origin:center;animation:santaBob .48s ease-in-out infinite alternate}
-#traveler .leg-back{transform-box:fill-box;transform-origin:top center;animation:legBack .48s ease-in-out infinite alternate}
-#traveler .leg-front{transform-box:fill-box;transform-origin:top center;animation:legFront .48s ease-in-out infinite alternate}
-#traveler .arm-back{transform-box:fill-box;transform-origin:top center;animation:armBack .48s ease-in-out infinite alternate}
-#traveler .arm-front{transform-box:fill-box;transform-origin:top center;animation:armFront .48s ease-in-out infinite alternate}
-@keyframes santaBob{from{transform:translateY(0) rotate(-1deg)}to{transform:translateY(-4px) rotate(1deg)}}
-@keyframes legBack{from{transform:rotate(23deg)}to{transform:rotate(-23deg)}}
-@keyframes legFront{from{transform:rotate(-23deg)}to{transform:rotate(23deg)}}
-@keyframes armBack{from{transform:rotate(-22deg)}to{transform:rotate(22deg)}}
-@keyframes armFront{from{transform:rotate(22deg)}to{transform:rotate(-22deg)}}
-.wallpaper-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}
-.wallpaper-choice{position:relative;min-width:0;border:2px solid #314563;border-radius:13px;overflow:hidden;padding:0;background:#0b1425;color:#fff;text-align:left;cursor:pointer;transition:border-color .18s,transform .18s}
-.wallpaper-choice:hover{transform:translateY(-2px);border-color:#79aaff}
-.wallpaper-choice.selected{border-color:#f2bd55;box-shadow:0 0 0 2px #f2bd5540}
-.wallpaper-choice .wallpaper-thumb{display:block;width:100%;aspect-ratio:16/9;background-size:cover;background-position:center}
-.wallpaper-choice .wallpaper-name{display:block;padding:9px 11px;font-weight:700}
-.wallpaper-choice .selected-mark{position:absolute;right:8px;top:8px;background:#e9ad42;color:#151515;border-radius:20px;padding:4px 8px;font-size:11px;font-weight:700;display:none}
-.wallpaper-choice.selected .selected-mark{display:block}
-@media(max-width:560px){.wallpaper-gallery{gap:8px}.wallpaper-choice .wallpaper-name{padding:8px;font-size:13px}}
+#traveler{position:absolute;z-index:3;left:0;top:68%;font-size:clamp(34px,6vw,76px);filter:drop-shadow(0 3px 8px #000);display:none;pointer-events:none;will-change:transform}
 .screen-label{position:absolute;top:18px;left:0;right:0;text-align:center;color:#ffffff80;font-size:12px;letter-spacing:3px;pointer-events:none}
 #login{max-width:420px;margin:50px auto}
 #controller{padding-bottom:40px}
@@ -150,14 +130,47 @@ textarea{min-height:75px;resize:vertical}
 </section>
 
 <section class="panel">
-<h2>❄️ Sneeuwbesturing</h2>
+<h2>❄️ Geavanceerde sneeuwbesturing</h2>
 <div class="grid">
 <button id="snowOn" class="snowbtn">❄️ SNEEUW AAN</button>
 <button id="snowOff" class="stopbtn">SNEEUW UIT</button>
 </div>
 <label>Sneeuwintensiteit: <strong id="snowIntensityValue">50%</strong></label>
 <input type="range" id="snowIntensity" min="10" max="100" value="50">
-<button id="applySnowIntensity" class="primary" style="margin-top:12px;width:100%">SNEEUWINTENSITEIT TOEPASSEN</button>
+<label>Sneeuwsoort</label>
+<select id="snowStyle">
+<option value="mixed">Magische mix – alle soorten</option>
+<option value="fine">Fijne sneeuw</option>
+<option value="fluffy">Grote sneeuwvlokken</option>
+<option value="crystal">Kristalsneeuw</option>
+<option value="storm">Sneeuwstorm</option>
+<option value="magic">Magische sneeuw</option>
+<option value="depth">Dieptesneeuw</option>
+</select>
+<label>Sneeuwsnelheid</label>
+<select id="snowSpeed">
+<option value="slow">Langzaam</option>
+<option value="normal" selected>Normaal</option>
+<option value="fast">Snel</option>
+<option value="storm">Stormachtig</option>
+</select>
+<label>Windrichting</label>
+<select id="snowWind">
+<option value="none">Geen wind</option>
+<option value="left">Naar links</option>
+<option value="right">Naar rechts</option>
+<option value="random" selected>Wisselende wind</option>
+</select>
+<label>Windkracht: <strong id="snowWindValue">30%</strong></label>
+<input type="range" id="snowWindStrength" min="0" max="100" value="30">
+<label>Magische gloed</label>
+<select id="snowGlow">
+<option value="off">Uit</option>
+<option value="soft" selected>Subtiel</option>
+<option value="strong">Sterk</option>
+</select>
+<button id="applySnowSettings" class="primary" style="margin-top:12px;width:100%">SNEEUWINSTELLINGEN TOEPASSEN</button>
+<p class="small">De sneeuwinstellingen gelden voor de geselecteerde schermen en worden opgeslagen in Firebase.</p>
 </section>
 
 <section class="panel">
@@ -183,15 +196,13 @@ textarea{min-height:75px;resize:vertical}
 <section class="panel">
 <h2>🎄 Kerstlandschap voor scherm 1 en 2</h2>
 <p class="small">Scherm 1 toont de linkerhelft en scherm 2 de rechterhelft. Schermen 3, 4 en 5 behouden hun effectenscherm zonder achtergrond.</p>
-<label>Kies een landschap</label>
-<div class="wallpaper-gallery" id="wallpaperGallery">
-<button type="button" class="wallpaper-choice selected" data-style="winterbos" aria-pressed="true"><span class="wallpaper-thumb" style="background-image:url('https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/winterbos-left.jpg?v=20261120')"></span><span class="wallpaper-name">Winterbos</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="alpendorp" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/alpendorp-left.jpg?v=20261120')"></span><span class="wallpaper-name">Alpendorp</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="frozen-lake" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/frozen-lake-left.jpg?v=20261120')"></span><span class="wallpaper-name">Bevroren meer</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="moonlight" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/moonlight-left.jpg?v=20261120')"></span><span class="wallpaper-name">Moonlight</span><span class="selected-mark">✓ Gekozen</span></button>
-<button type="button" class="wallpaper-choice" data-style="coca-cola-plein" aria-pressed="false"><span class="wallpaper-thumb" style="background-image:url('https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/coca-cola-plein-left.jpg?v=20261120')"></span><span class="wallpaper-name">Coca-Cola kerstplein</span><span class="selected-mark">✓ Gekozen</span></button>
-</div>
-<select id="wallpaperStyle" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"><option value="winterbos">Winterbos</option><option value="alpendorp">Alpendorp</option><option value="frozen-lake">Bevroren meer</option><option value="moonlight">Moonlight</option><option value="coca-cola-plein">Coca-Cola kerstplein</option></select>
+<label>Kies het landschap</label>
+<select id="wallpaperStyle">
+<option value="winterbos">Winterbos</option>
+<option value="alpendorp">Alpendorp</option>
+<option value="frozen-lake">Bevroren meer</option>
+<option value="moonlight">Moonlight</option>
+</select>
 <button id="applyWallpaper" class="primary" style="width:100%;margin-top:12px">ACHTERGROND TOEPASSEN</button>
 <div class="small" style="margin-top:10px">Zorg dat de map backgrounds naast index.html staat.</div>
 <div class="divider"></div>
@@ -243,13 +254,7 @@ textarea{min-height:75px;resize:vertical}
 
 <div id="screen" class="hidden">
 <div id="wallpaper"></div>
-<div id="traveler" aria-hidden="true"><svg viewBox="0 0 120 150" role="presentation"><g class="santa-body">
-<g class="leg-back"><path d="M53 105 L48 128" stroke="#202b42" stroke-width="11" stroke-linecap="round"/><path d="M48 128 Q39 132 36 138 Q35 142 42 142 L58 141 Q62 138 57 134 L54 128" fill="#241d25"/><path d="M43 133 L56 133" stroke="#fff" stroke-width="3"/></g>
-<g class="leg-front"><path d="M68 105 L73 128" stroke="#202b42" stroke-width="11" stroke-linecap="round"/><path d="M73 128 Q82 132 85 138 Q86 142 79 142 L63 141 Q59 138 64 134 L67 128" fill="#241d25"/><path d="M64 133 L81 133" stroke="#fff" stroke-width="3"/></g>
-<path d="M39 57 Q60 48 81 57 L88 111 Q61 122 32 111 Z" fill="#c91f35" stroke="#8c1427" stroke-width="2"/><path d="M54 54 L60 111 L68 111 L66 54" fill="#fff0dc"/><path d="M35 109 Q60 117 86 109 L88 117 Q60 127 32 117 Z" fill="#fff"/><circle cx="60" cy="75" r="3" fill="#e8b34d"/><circle cx="61" cy="91" r="3" fill="#e8b34d"/>
-<g class="arm-back"><path d="M39 64 Q27 75 24 91" fill="none" stroke="#c91f35" stroke-width="12" stroke-linecap="round"/><path d="M24 88 L22 97" stroke="#fff" stroke-width="12" stroke-linecap="round"/><circle cx="22" cy="101" r="7" fill="#f1c6a4"/></g><g class="arm-front"><path d="M80 64 Q93 76 96 90" fill="none" stroke="#c91f35" stroke-width="12" stroke-linecap="round"/><path d="M96 87 L98 96" stroke="#fff" stroke-width="12" stroke-linecap="round"/><circle cx="99" cy="100" r="7" fill="#f1c6a4"/></g>
-<circle cx="60" cy="38" r="24" fill="#f1c6a4"/><path d="M38 39 Q40 12 61 12 Q81 13 83 40 Q71 32 60 34 Q48 33 38 39" fill="#fff"/><path d="M37 27 Q56 7 78 22 L87 15 Q91 8 84 5 Q65 -1 45 11 Q34 16 37 27" fill="#c91f35"/><path d="M39 28 Q60 19 81 29" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="86" cy="8" r="8" fill="#fff"/><circle cx="51" cy="38" r="2.5" fill="#29202a"/><circle cx="69" cy="38" r="2.5" fill="#29202a"/><path d="M54 48 Q60 53 67 48" fill="none" stroke="#8d3d35" stroke-width="2" stroke-linecap="round"/><path d="M43 49 Q60 69 77 49 Q75 66 60 68 Q45 66 43 49" fill="#fff"/>
-</g></svg></div>
+<div id="traveler">🎅</div>
 <canvas id="fireworks"></canvas>
 <div class="screen-label" id="screenLabel"></div>
 </div>
@@ -291,6 +296,13 @@ let currentAction="off";
 let currentDisplayMode="off";
 let fireIntensity=65;
 let snowIntensity=50;
+let snowConfig={
+ style:"mixed",
+ speed:"normal",
+ wind:"random",
+ windStrength:30,
+ glow:"soft"
+};
 let particles=[];
 let snowflakes=[];
 let animationFrame=0;
@@ -300,11 +312,10 @@ let lastCommandId="";
 let screenSettings={};
 
 const wallpaperFiles={
- winterbos:["https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/winterbos-left.jpg?v=20261120","https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/winterbos-right.jpg?v=20261120"],
- alpendorp:["https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/alpendorp-left.jpg?v=20261120","https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/alpendorp-right.jpg?v=20261120"],
- "frozen-lake":["https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/frozen-lake-left.jpg?v=20261120","https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/frozen-lake-right.jpg?v=20261120"],
- moonlight:["https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/moonlight-left.jpg?v=20261120","https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/moonlight-right.jpg?v=20261120"],
- "coca-cola-plein":["https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/coca-cola-plein-left.jpg?v=20261120","https://raw.githubusercontent.com/NachoFamilyapp/Promises2U-Fireworks/main/backgrounds/coca-cola-plein-right.jpg?v=20261120"]
+ winterbos:["backgrounds/winterbos-left.jpg","backgrounds/winterbos-right.jpg"],
+ alpendorp:["backgrounds/alpendorp-left.jpg","backgrounds/alpendorp-right.jpg"],
+ "frozen-lake":["backgrounds/frozen-lake-left.jpg","backgrounds/frozen-lake-right.jpg"],
+ moonlight:["backgrounds/moonlight-left.jpg","backgrounds/moonlight-right.jpg"]
 };
 
 function setStatus(message){
@@ -326,35 +337,30 @@ function applyWallpaper(style){
  if(!isScreen||browserNumber>2)return;
  const pair=wallpaperFiles[style]||wallpaperFiles.winterbos;
  const file=pair[browserNumber-1];
- if(!file){console.error("Geen achtergrondbestand voor scherm",browserNumber,style);return;}
- // Preload eerst de afbeelding. Zo tonen we geen lege achtergrond als een URL niet bereikbaar is.
- const image=new Image();
- image.onload=()=>{
-  wallpaper.style.backgroundImage=`url("${file}")`;
-  wallpaper.style.backgroundSize="cover";
-  wallpaper.style.backgroundPosition="center center";
-  wallpaper.style.backgroundRepeat="no-repeat";
-  wallpaper.style.display="block";
-  wallpaperStyle=style;
- };
- image.onerror=()=>console.error("Achtergrond kon niet worden geladen:",file);
- image.src=file;
+ wallpaper.style.backgroundImage=`url("${file}")`;
+ wallpaper.style.display="block";
+ wallpaperStyle=style;
 }
 
 function animateSanta(){
- if(!isScreen||browserNumber>2||!santaStartAt){if(traveler)traveler.style.display="none";return;}
- const cycle=24000;
- const elapsed=((Date.now()-santaStartAt)%cycle+cycle)%cycle;
+ if(!isScreen||browserNumber>2||!santaStartAt){
+  if(traveler)traveler.style.display="none";
+  return;
+ }
+ const elapsed=(Date.now()-santaStartAt)%24000;
+ if(elapsed<0){traveler.style.display="none";return;}
  const segment=elapsed<12000?1:2;
- if(browserNumber!==segment){traveler.style.display="none";return;}
+ if(browserNumber!==segment){
+  traveler.style.display="none";
+  return;
+ }
  const localTime=segment===1?elapsed:elapsed-12000;
  const progress=localTime/12000;
- const santaWidth=traveler.getBoundingClientRect().width||100;
- const x=-santaWidth+(innerWidth+santaWidth*2)*progress;
  traveler.style.display="block";
- traveler.style.transform=`translate3d(${x}px,0,0)`;
- traveler.style.top=`${68+Math.sin((elapsed/480)*Math.PI*2)*0.7}%`;
+ traveler.style.transform=`translateX(${progress*(innerWidth+100)-70}px)`;
+ traveler.style.top=`${68+Math.sin(progress*Math.PI*4)*2}%`;
 }
+
 function startSantaAnimation(){
  if(!isScreen||browserNumber>2)return;
  setInterval(animateSanta,50);
@@ -400,6 +406,150 @@ function launchRandomBurst(){
  makeBurst(random(innerWidth*.12,innerWidth*.88),random(innerHeight*.12,innerHeight*.52),chosen,size);
 }
 
+
+function createSnowflake(){
+ const style=snowConfig.style==="mixed"
+  ? ["fine","fluffy","crystal","magic","depth","storm"][Math.floor(Math.random()*6)]
+  : snowConfig.style;
+
+ const layer=Math.random();
+ let size;
+ switch(style){
+  case "fine": size=random(.65,1.5); break;
+  case "fluffy": size=random(2.8,5.8); break;
+  case "crystal": size=random(2.2,4.8); break;
+  case "magic": size=random(1.3,3.8); break;
+  case "storm": size=random(1.8,4.5); break;
+  default: size=random(1.1,5.2);
+ }
+
+ const speedMap={slow:.55,normal:1,fast:1.65,storm:2.35};
+ const speedFactor=speedMap[snowConfig.speed]||1;
+
+ return {
+  x:random(-20,innerWidth+20),
+  y:random(-innerHeight,innerHeight),
+  size,
+  style,
+  layer,
+  speed:random(.55,1.45)*speedFactor*(.55+layer*.9),
+  drift:random(-.45,.45),
+  phase:random(0,Math.PI*2),
+  rotation:random(0,Math.PI*2),
+  rotationSpeed:random(-.018,.018),
+  alpha:random(.48,.96)
+ };
+}
+
+function drawSnowCrystal(x,y,size,rotation){
+ ctx.save();
+ ctx.translate(x,y);
+ ctx.rotate(rotation);
+ ctx.strokeStyle="#f4fbff";
+ ctx.lineWidth=Math.max(.65,size*.22);
+ ctx.lineCap="round";
+ for(let arm=0;arm<6;arm++){
+  ctx.rotate(Math.PI/3);
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.lineTo(0,-size*1.8);
+  ctx.moveTo(0,-size*.85);
+  ctx.lineTo(-size*.42,-size*1.25);
+  ctx.moveTo(0,-size*.85);
+  ctx.lineTo(size*.42,-size*1.25);
+  ctx.stroke();
+ }
+ ctx.restore();
+}
+
+function drawSnowStar(x,y,size,rotation){
+ ctx.save();
+ ctx.translate(x,y);
+ ctx.rotate(rotation);
+ ctx.fillStyle="#ffffff";
+ ctx.beginPath();
+ for(let i=0;i<10;i++){
+  const radius=i%2===0?size:size*.42;
+  const angle=-Math.PI/2+i*Math.PI/5;
+  const px=Math.cos(angle)*radius;
+  const py=Math.sin(angle)*radius;
+  if(i===0)ctx.moveTo(px,py);
+  else ctx.lineTo(px,py);
+ }
+ ctx.closePath();
+ ctx.fill();
+ ctx.restore();
+}
+
+function drawSnow(){
+ const intensity=Math.max(10,Math.min(100,Number(snowIntensity)||50));
+ const target=Math.floor(intensity*2.15);
+ const windStrength=Math.max(0,Math.min(100,Number(snowConfig.windStrength)||0))/100;
+
+ let wind=0;
+ if(snowConfig.wind==="left")wind=-1;
+ else if(snowConfig.wind==="right")wind=1;
+ else if(snowConfig.wind==="random")wind=Math.sin(Date.now()/1700);
+ wind*=windStrength*2.2;
+
+ while(snowflakes.length<target) snowflakes.push(createSnowflake());
+ if(snowflakes.length>target) snowflakes.length=target;
+
+ for(const flake of snowflakes){
+  flake.phase+=.025;
+  flake.rotation+=flake.rotationSpeed;
+  flake.x+=wind*flake.speed+flake.drift+Math.sin(flake.phase)*.24;
+  flake.y+=flake.speed;
+  const scale=.55+flake.layer*.72;
+  const size=flake.size*scale;
+
+  if(flake.y>innerHeight+15){
+   flake.y=-10;
+   flake.x=random(0,innerWidth);
+  }
+  if(flake.x>innerWidth+20)flake.x=-15;
+  if(flake.x<-20)flake.x=innerWidth+15;
+
+  const wantsGlow=flake.style==="magic"||snowConfig.glow!=="off";
+  ctx.save();
+  ctx.globalAlpha=flake.alpha;
+  if(wantsGlow){
+   ctx.shadowBlur=snowConfig.glow==="strong"?16:(flake.style==="magic"?10:6);
+   ctx.shadowColor="#bdeaff";
+  }
+
+  if(flake.style==="crystal"){
+   drawSnowCrystal(flake.x,flake.y,size,flake.rotation);
+  }else if(flake.style==="magic"){
+   drawSnowStar(flake.x,flake.y,size,flake.rotation);
+   ctx.fillStyle="#dff7ff";
+   ctx.beginPath();
+   ctx.arc(flake.x,flake.y,size*.35,0,Math.PI*2);
+   ctx.fill();
+  }else if(flake.style==="fluffy"){
+   ctx.fillStyle="#ffffff";
+   ctx.beginPath();
+   ctx.arc(flake.x,flake.y,size,0,Math.PI*2);
+   ctx.arc(flake.x-size*.58,flake.y+size*.12,size*.58,0,Math.PI*2);
+   ctx.arc(flake.x+size*.58,flake.y+size*.12,size*.58,0,Math.PI*2);
+   ctx.arc(flake.x,flake.y-size*.48,size*.55,0,Math.PI*2);
+   ctx.fill();
+  }else{
+   ctx.fillStyle=flake.style==="storm"?"#eaf7ff":"#ffffff";
+   ctx.beginPath();
+   ctx.arc(flake.x,flake.y,size,0,Math.PI*2);
+   ctx.fill();
+   if(flake.style==="depth"&&flake.layer>.72){
+    ctx.globalAlpha=flake.alpha*.35;
+    ctx.beginPath();
+    ctx.arc(flake.x-size*.45,flake.y-size*.35,size*.55,0,Math.PI*2);
+    ctx.fill();
+   }
+  }
+  ctx.restore();
+ }
+}
+
 function drawFireworks(){
  if(!isScreen)return;
  ctx.clearRect(0,0,innerWidth,innerHeight);
@@ -429,18 +579,10 @@ function drawFireworks(){
  }
  ctx.globalAlpha=1;
  if(currentDisplayMode==="snow"||currentAction==="snow-on"){
-  const amount=Math.floor(snowIntensity*1.5);
-  while(snowflakes.length<amount){
-   snowflakes.push({x:random(0,innerWidth),y:random(-innerHeight,0),r:random(1,4),v:random(.6,2.5),drift:random(-.5,.5)});
-  }
-  snowflakes.forEach(f=>{
-   f.y+=f.v;f.x+=f.drift;
-   if(f.y>innerHeight){f.y=-5;f.x=random(0,innerWidth);}
-   ctx.fillStyle="#ffffff";
-   ctx.globalAlpha=.7;
-   ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();
-  });
- }else{snowflakes=[];}
+  drawSnow();
+ }else{
+  snowflakes=[];
+ }
  ctx.globalAlpha=1;
  animationFrame=requestAnimationFrame(drawFireworks);
 }
@@ -524,6 +666,22 @@ function listenForScreen(){
   }
   startAnimation();
  });
+ onValue(ref(db,"settings/snowIntensity"),snapshot=>{
+  const value=Number(snapshot.val());
+  if(Number.isFinite(value))snowIntensity=Math.max(10,Math.min(100,value));
+ });
+ onValue(ref(db,"settings/snowConfig"),snapshot=>{
+  const value=snapshot.val();
+  if(value&&typeof value==="object"){
+   snowConfig={
+    style:value.style||"mixed",
+    speed:value.speed||"normal",
+    wind:value.wind||"random",
+    windStrength:Number.isFinite(Number(value.windStrength))?Number(value.windStrength):30,
+    glow:value.glow||"soft"
+   };
+  }
+ });
  onValue(ref(db,"settings/wallpaperStyle"),snapshot=>{
   const style=snapshot.val()||"winterbos";
   wallpaperStyle=style;
@@ -589,13 +747,27 @@ function setupController(){
   burstSize:document.getElementById("burstSize").value,
   shellType:document.getElementById("shellType").value
  });
- document.getElementById("applySnowIntensity").onclick=async()=>{
-  const value=Number(document.getElementById("snowIntensity").value);
-  try{
-   await set(ref(db,"settings/snowIntensity"),value);
-   setStatus("Sneeuwintensiteit ingesteld op "+value+"%");
-  }catch(e){setStatus("Fout: "+e.message);}
+ document.getElementById("snowWindStrength").oninput=e=>{
+  document.getElementById("snowWindValue").textContent=e.target.value+"%";
  };
+ document.getElementById("applySnowSettings").onclick=async()=>{
+  const intensity=Number(document.getElementById("snowIntensity").value);
+  const config={
+   style:document.getElementById("snowStyle").value,
+   speed:document.getElementById("snowSpeed").value,
+   wind:document.getElementById("snowWind").value,
+   windStrength:Number(document.getElementById("snowWindStrength").value),
+   glow:document.getElementById("snowGlow").value
+  };
+  try{
+   await set(ref(db,"settings/snowIntensity"),intensity);
+   await set(ref(db,"settings/snowConfig"),config);
+   snowIntensity=intensity;
+   snowConfig=config;
+   setStatus("Sneeuwinstellingen opgeslagen en toegepast op de schermen.");
+  }catch(e){setStatus("Sneeuwinstellingen niet opgeslagen: "+e.message);}
+ };
+
  document.getElementById("showProjection").onclick=()=>sendCommand("projection",{
   text:document.getElementById("projectionText").value,
   image:document.getElementById("projectionImage").value,
@@ -604,13 +776,7 @@ function setupController(){
  });
  document.getElementById("clearProjection").onclick=()=>sendCommand("clear-projection");
  document.getElementById("refreshScreens").onclick=()=>sendCommand("refresh");
- const wallpaperGallery=document.getElementById("wallpaperGallery");
-wallpaperGallery.querySelectorAll(".wallpaper-choice").forEach(choice=>choice.addEventListener("click",()=>{
- wallpaperGallery.querySelectorAll(".wallpaper-choice").forEach(item=>{const active=item===choice;item.classList.toggle("selected",active);item.setAttribute("aria-pressed",String(active));});
- document.getElementById("wallpaperStyle").value=choice.dataset.style;
-}));
-
-document.getElementById("applyWallpaper").onclick=async()=>{
+ document.getElementById("applyWallpaper").onclick=async()=>{
   const style=document.getElementById("wallpaperStyle").value;
   try{
    await set(ref(db,"settings/wallpaperStyle"),style);
@@ -650,13 +816,7 @@ function initScreen(){
  document.body.innerHTML=`
  <div id="screen">
   <div id="wallpaper"></div>
-  <div id="traveler" aria-hidden="true"><svg viewBox="0 0 120 150" role="presentation"><g class="santa-body">
-<g class="leg-back"><path d="M53 105 L48 128" stroke="#202b42" stroke-width="11" stroke-linecap="round"/><path d="M48 128 Q39 132 36 138 Q35 142 42 142 L58 141 Q62 138 57 134 L54 128" fill="#241d25"/><path d="M43 133 L56 133" stroke="#fff" stroke-width="3"/></g>
-<g class="leg-front"><path d="M68 105 L73 128" stroke="#202b42" stroke-width="11" stroke-linecap="round"/><path d="M73 128 Q82 132 85 138 Q86 142 79 142 L63 141 Q59 138 64 134 L67 128" fill="#241d25"/><path d="M64 133 L81 133" stroke="#fff" stroke-width="3"/></g>
-<path d="M39 57 Q60 48 81 57 L88 111 Q61 122 32 111 Z" fill="#c91f35" stroke="#8c1427" stroke-width="2"/><path d="M54 54 L60 111 L68 111 L66 54" fill="#fff0dc"/><path d="M35 109 Q60 117 86 109 L88 117 Q60 127 32 117 Z" fill="#fff"/><circle cx="60" cy="75" r="3" fill="#e8b34d"/><circle cx="61" cy="91" r="3" fill="#e8b34d"/>
-<g class="arm-back"><path d="M39 64 Q27 75 24 91" fill="none" stroke="#c91f35" stroke-width="12" stroke-linecap="round"/><path d="M24 88 L22 97" stroke="#fff" stroke-width="12" stroke-linecap="round"/><circle cx="22" cy="101" r="7" fill="#f1c6a4"/></g><g class="arm-front"><path d="M80 64 Q93 76 96 90" fill="none" stroke="#c91f35" stroke-width="12" stroke-linecap="round"/><path d="M96 87 L98 96" stroke="#fff" stroke-width="12" stroke-linecap="round"/><circle cx="99" cy="100" r="7" fill="#f1c6a4"/></g>
-<circle cx="60" cy="38" r="24" fill="#f1c6a4"/><path d="M38 39 Q40 12 61 12 Q81 13 83 40 Q71 32 60 34 Q48 33 38 39" fill="#fff"/><path d="M37 27 Q56 7 78 22 L87 15 Q91 8 84 5 Q65 -1 45 11 Q34 16 37 27" fill="#c91f35"/><path d="M39 28 Q60 19 81 29" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="86" cy="8" r="8" fill="#fff"/><circle cx="51" cy="38" r="2.5" fill="#29202a"/><circle cx="69" cy="38" r="2.5" fill="#29202a"/><path d="M54 48 Q60 53 67 48" fill="none" stroke="#8d3d35" stroke-width="2" stroke-linecap="round"/><path d="M43 49 Q60 69 77 49 Q75 66 60 68 Q45 66 43 49" fill="#fff"/>
-</g></svg></div>
+  <div id="traveler">🎅</div>
   <canvas id="fireworks"></canvas>
   <div class="screen-label" id="screenLabel"></div>
  </div>`;
@@ -699,6 +859,24 @@ async function init(){
     controller.classList.remove("hidden");
     setupController();
     setupPreviews();
+    onValue(ref(db,"settings/snowIntensity"),snapshot=>{
+     const value=Number(snapshot.val());
+     if(Number.isFinite(value)){
+      document.getElementById("snowIntensity").value=value;
+      document.getElementById("snowIntensityValue").textContent=value+"%";
+     }
+    });
+    onValue(ref(db,"settings/snowConfig"),snapshot=>{
+     const value=snapshot.val();
+     if(value){
+      document.getElementById("snowStyle").value=value.style||"mixed";
+      document.getElementById("snowSpeed").value=value.speed||"normal";
+      document.getElementById("snowWind").value=value.wind||"random";
+      document.getElementById("snowWindStrength").value=Number(value.windStrength??30);
+      document.getElementById("snowWindValue").textContent=Number(value.windStrength??30)+"%";
+      document.getElementById("snowGlow").value=value.glow||"soft";
+     }
+    });
     setStatus("Beheerder ingelogd en verbonden.");
    }catch(error){status.textContent="Inloggen mislukt: "+error.message;}
   };
