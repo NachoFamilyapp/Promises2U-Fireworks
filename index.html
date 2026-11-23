@@ -213,6 +213,20 @@ textarea{min-height:75px;resize:vertical}
 <button id="startSanta" class="goldbtn">🎅 START KERSTMAN</button>
 <button id="stopSanta" class="stopbtn">STOP KERSTMAN</button>
 </div>
+<div class="divider"></div>
+<h3>⏱️ Kerstman-timer</h3>
+<label for="santaInterval">Wanneer mag Santa opnieuw komen?</label>
+<select id="santaInterval">
+ <option value="0">Alleen handmatig</option>
+ <option value="300">Elke 5 minuten na terugkeer</option>
+ <option value="600">Elke 10 minuten na terugkeer</option>
+ <option value="900">Elke 15 minuten na terugkeer</option>
+ <option value="1800">Elke 30 minuten na terugkeer</option>
+ <option value="3600">Elk uur na terugkeer</option>
+ <option value="random">Willekeurig (5–30 minuten na terugkeer)</option>
+</select>
+<p class="small">De wachttijd begint pas nadat Santa helemaal terug is en het huis is ingegaan.</p>
+<div id="santaTimerStatus" class="small">Timer uit</div>
 </section>
 
 <section class="panel">
@@ -308,6 +322,9 @@ let particles=[];
 let snowflakes=[];
 let animationFrame=0;
 let santaStartAt=0;
+let santaScheduleTimeout=null;
+let santaRunTimeout=null;
+let santaTimerActive=false;
 let wallpaperStyle="winterbos";
 let lastCommandId="";
 let screenSettings={};
@@ -344,56 +361,64 @@ function applyWallpaper(style){
  wallpaperStyle=style;
 }
 
+const SANTA_VISIT_SECONDS=38;
+function easeInOutCubic(t){
+ return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+}
 function animateSanta(){
  if(!isScreen||browserNumber>2||!santaStartAt){
   if(traveler)traveler.style.display="none";
   return;
  }
  const elapsed=(Date.now()-santaStartAt)/1000;
- const totalWidth=innerWidth*2;
- const spriteWidth=traveler.getBoundingClientRect().width||Math.min(220,innerWidth*.15);
- let x=0, frame=0, opacity=1, flip=1, top=58;
- // One continuous 28-second performance across screens 1 and 2:
- // walk in, greet, dance by the tree, walk back to a house and disappear.
- if(elapsed<0){traveler.style.display="none";return;}
- if(elapsed<12){
-  const p=elapsed/12;
-  x=-spriteWidth+(totalWidth*.72+spriteWidth)*p;
-  frame=[0,1,2][Math.floor(elapsed*2)%3];
-  if(elapsed>3.2&&elapsed<4.7)frame=2; // friendly greeting
-  top=58+Math.sin(elapsed*5)*.45;
- }else if(elapsed<20){
-  x=totalWidth*.72;
-  frame=[3,4,5,4][Math.floor((elapsed-12)*1.5)%4];
-  top=57+Math.abs(Math.sin((elapsed-12)*4))*1.4;
- }else if(elapsed<28){
-  const p=(elapsed-20)/8;
-  x=totalWidth*.72-(totalWidth*.16)*p;
-  frame=[6,7][Math.floor((elapsed-20)*2)%2];
-  flip=-1;
-  top=58+Math.sin(elapsed*4)*.35;
-  if(elapsed>26.5)opacity=Math.max(0,1-(elapsed-26.5)/1.5);
- }else{
+ if(elapsed<0||elapsed>=SANTA_VISIT_SECONDS){
   traveler.style.display="none";
   return;
  }
+ const totalWidth=innerWidth*2;
+ const spriteWidth=traveler.getBoundingClientRect().width||Math.min(220,innerWidth*.15);
+ let x=0, frame=0, opacity=1, flip=1, top=58;
+ // Coordinates span both joined displays. Santa pauses at the tree before dancing.
+ const treeX=totalWidth*.70;
+ if(elapsed<16){
+  const p=easeInOutCubic(elapsed/16);
+  x=-spriteWidth+(treeX+spriteWidth)*p;
+  frame=Math.floor((elapsed*5)%3); // brisk, regular walking cycle
+  top=58+Math.sin(elapsed*8)*.18;
+ }else if(elapsed<20){
+  x=treeX;
+  frame=3; // stop and wave to the village
+  top=58;
+ }else if(elapsed<29){
+  x=treeX;
+  const danceT=elapsed-20;
+  frame=[4,5,6,5][Math.floor(danceT*2.4)%4];
+  top=57.4+Math.abs(Math.sin(danceT*4.5))*1.0;
+ }else{
+  const p=easeInOutCubic((elapsed-29)/9);
+  x=treeX-(treeX+spriteWidth*.9)*p;
+  frame=7;
+  flip=-1;
+  top=58+Math.sin(elapsed*7)*.15;
+  if(elapsed>36.5)opacity=Math.max(0,1-(elapsed-36.5)/1.5);
+ }
  const screenOffset=(browserNumber-1)*innerWidth;
  const localX=x-screenOffset;
- if(localX < -spriteWidth-10 || localX > innerWidth+10){
+ if(localX < -spriteWidth-12 || localX > innerWidth+12){
   traveler.style.display="none";
   return;
  }
  traveler.style.display="block";
  traveler.style.opacity=String(opacity);
  traveler.style.top=top+"%";
+ // Eight equally-sized poses in the transparent sprite strip.
  traveler.style.backgroundPosition=(frame/7*100)+"% 50%";
  traveler.style.transform=`translate3d(${localX}px,0,0) scaleX(${flip})`;
 }
-
 function startSantaAnimation(){
  if(!isScreen||browserNumber>2)return;
  if(window.santaAnimationTimer)clearInterval(window.santaAnimationTimer);
- window.santaAnimationTimer=setInterval(animateSanta,40);
+ window.santaAnimationTimer=setInterval(animateSanta,33);
  animateSanta();
 }
 
@@ -814,17 +839,66 @@ function setupController(){
    setStatus("Achtergrond toegepast: "+style);
   }catch(e){setStatus("Achtergrondfout: "+e.message);}
  };
+ const santaTimerStatus=document.getElementById("santaTimerStatus");
+ const santaInterval=document.getElementById("santaInterval");
+ function clearSantaTimers(){
+  if(santaScheduleTimeout)clearTimeout(santaScheduleTimeout);
+  if(santaRunTimeout)clearTimeout(santaRunTimeout);
+  santaScheduleTimeout=null;santaRunTimeout=null;santaTimerActive=false;
+ }
+ function selectedSantaDelay(){
+  const choice=santaInterval.value;
+  if(choice==="random")return Math.floor(300+Math.random()*1501); // 5–30 minutes
+  return Number(choice||0);
+ }
+ async function scheduleSantaAfterReturn(){
+  const delay=selectedSantaDelay();
+  if(!delay){
+   santaTimerStatus.textContent="Timer uit – alleen handmatig starten.";
+   return;
+  }
+  santaTimerActive=true;
+  santaTimerStatus.textContent="Santa is onderweg. De timer start na zijn terugkeer.";
+  // This timeout begins only after the complete 38-second walk/dance/exit.
+  santaRunTimeout=setTimeout(()=>{
+   if(!santaTimerActive)return;
+   const nextDelay=selectedSantaDelay();
+   if(!nextDelay){santaTimerStatus.textContent="Timer uit.";return;}
+   const nextStartAt=Date.now()+nextDelay*1000;
+   const mins=Math.round(nextDelay/60);
+   santaTimerStatus.textContent=(santaInterval.value==="random"?"Willekeurige volgende komst":"Volgende komst")+
+    " over ongeveer "+mins+" min. (na terugkeer)";
+   santaScheduleTimeout=setTimeout(async()=>{
+    if(!santaTimerActive)return;
+    try{
+     await set(ref(db,"settings/santaStartAt"),Date.now());
+     await scheduleSantaAfterReturn();
+    }catch(e){
+     santaTimerStatus.textContent="Timerfout: "+e.message;
+    }
+   },nextStartAt-Date.now());
+  },SANTA_VISIT_SECONDS*1000);
+ }
  document.getElementById("startSanta").onclick=async()=>{
   try{
+   clearSantaTimers();
    await set(ref(db,"settings/santaStartAt"),Date.now());
-   setStatus("Santa gestart: wandeling, begroeting, dans en terug naar het huis.");
+   setStatus("Santa gestart: rustig lopen, groeten, dansen bij de kerstboom en terug naar het huis.");
+   await scheduleSantaAfterReturn();
   }catch(e){setStatus("Kerstmanfout: "+e.message);}
  };
  document.getElementById("stopSanta").onclick=async()=>{
   try{
+   clearSantaTimers();
    await set(ref(db,"settings/santaStartAt"),0);
-   setStatus("Kerstman gestopt.");
+   santaTimerStatus.textContent="Timer gestopt.";
+   setStatus("Kerstman en timer gestopt.");
   }catch(e){setStatus("Kerstmanfout: "+e.message);}
+ };
+ santaInterval.onchange=()=>{
+  if(santaInterval.value==="random")santaTimerStatus.textContent="Willekeurig: 5 tot 30 minuten na terugkeer.";
+  else if(Number(santaInterval.value)>0)santaTimerStatus.textContent="Interval ingesteld. De wachttijd start na terugkeer.";
+  else santaTimerStatus.textContent="Timer uit – alleen handmatig starten.";
  };
 }
 
