@@ -361,9 +361,21 @@ function applyWallpaper(style){
  wallpaperStyle=style;
 }
 
-const SANTA_VISIT_SECONDS=38;
+const SANTA_APPROACH_SECONDS=24;
+const SANTA_DANCE_SECONDS=30;
+const SANTA_RETURN_SECONDS=22;
+const SANTA_VISIT_SECONDS=SANTA_APPROACH_SECONDS+SANTA_DANCE_SECONDS+SANTA_RETURN_SECONDS;
+
 function easeInOutCubic(t){
  return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+}
+function smoothstep(t){
+ return t*t*(3-2*t);
+}
+function santaWalkFrame(t){
+ // A calm, even walking cadence: about one complete step cycle per 1.25 seconds.
+ const phase=(t/1.25)%1;
+ return phase<.25?0:phase<.5?1:phase<.75?2:1;
 }
 function animateSanta(){
  if(!isScreen||browserNumber>2||!santaStartAt){
@@ -375,50 +387,82 @@ function animateSanta(){
   traveler.style.display="none";
   return;
  }
+
  const totalWidth=innerWidth*2;
  const spriteWidth=traveler.getBoundingClientRect().width||Math.min(220,innerWidth*.15);
- let x=0, frame=0, opacity=1, flip=1, top=58;
- // Coordinates span both joined displays. Santa pauses at the tree before dancing.
- const treeX=totalWidth*.70;
- if(elapsed<16){
-  const p=easeInOutCubic(elapsed/16);
-  x=-spriteWidth+(treeX+spriteWidth)*p;
-  frame=Math.floor((elapsed*5)%3); // brisk, regular walking cycle
-  top=58+Math.sin(elapsed*8)*.18;
- }else if(elapsed<20){
-  x=treeX;
-  frame=3; // stop and wave to the village
-  top=58;
- }else if(elapsed<29){
-  x=treeX;
-  const danceT=elapsed-20;
-  frame=[4,5,6,5][Math.floor(danceT*2.4)%4];
-  top=57.4+Math.abs(Math.sin(danceT*4.5))*1.0;
+
+ // Santa passes the truck area and stops just beyond the Christmas tree.
+ // Coordinates are shared by screen 1 and screen 2.
+ const treeStopX=totalWidth*.82;
+ const startX=-spriteWidth-12;
+ const returnEndX=-spriteWidth-24;
+
+ let x=startX, frame=0, opacity=1, flip=1, top=58;
+
+ if(elapsed<SANTA_APPROACH_SECONDS){
+  const t=elapsed/SANTA_APPROACH_SECONDS;
+  x=startX+(treeStopX-startX)*easeInOutCubic(t);
+  frame=santaWalkFrame(elapsed);
+
+  // Two small "tok-tok" dance accents while walking, then immediately resume walking.
+  const tokWindows=[[6.0,7.6],[15.0,16.6]];
+  for(const w of tokWindows){
+   if(elapsed>=w[0]&&elapsed<w[1]){
+    const beat=(elapsed-w[0])%0.8;
+    frame=beat<0.22?4:beat<0.42?5:santaWalkFrame(elapsed);
+    top=58-Math.abs(Math.sin((elapsed-w[0])*Math.PI*2.5))*0.55;
+    break;
+   }
+  }
+  if(top===58)top=58+Math.sin(elapsed*Math.PI*2/1.25)*0.12;
+ }else if(elapsed<SANTA_APPROACH_SECONDS+SANTA_DANCE_SECONDS){
+  const danceElapsed=elapsed-SANTA_APPROACH_SECONDS;
+  x=treeStopX;
+  top=57.8;
+  // 30-second choreo: greeting, side steps, gentle turns, toe taps, claps and finale.
+  if(danceElapsed<4){
+   frame=[3,4,3,4][Math.floor(danceElapsed*1.1)%4]; // greet
+  }else if(danceElapsed<11){
+   frame=[5,6,5,4][Math.floor((danceElapsed-4)*1.15)%4]; // side-to-side
+   top=57.5+Math.abs(Math.sin((danceElapsed-4)*2.2))*0.55;
+  }else if(danceElapsed<18){
+   frame=[4,5,6,5][Math.floor((danceElapsed-11)*1.1)%4]; // turn and toe taps
+   top=57.6+Math.abs(Math.sin((danceElapsed-11)*2.5))*0.7;
+  }else if(danceElapsed<25){
+   frame=[5,4,6,4][Math.floor((danceElapsed-18)*1.25)%4]; // cheerful dance steps
+   top=57.4+Math.abs(Math.sin((danceElapsed-18)*2.8))*0.8;
+  }else{
+   frame=[3,4,3,4][Math.floor((danceElapsed-25)*1.1)%4]; // final wave
+  }
  }else{
-  const p=easeInOutCubic((elapsed-29)/9);
-  x=treeX-(treeX+spriteWidth*.9)*p;
-  frame=7;
+  const returnElapsed=elapsed-SANTA_APPROACH_SECONDS-SANTA_DANCE_SECONDS;
+  const t=returnElapsed/SANTA_RETURN_SECONDS;
+  x=treeStopX+(returnEndX-treeStopX)*easeInOutCubic(t);
+  frame=santaWalkFrame(returnElapsed);
   flip=-1;
-  top=58+Math.sin(elapsed*7)*.15;
-  if(elapsed>36.5)opacity=Math.max(0,1-(elapsed-36.5)/1.5);
+  top=58+Math.sin(returnElapsed*Math.PI*2/1.25)*0.12;
+  if(returnElapsed>SANTA_RETURN_SECONDS-1.4){
+   opacity=Math.max(0,1-(returnElapsed-(SANTA_RETURN_SECONDS-1.4))/1.4);
+  }
  }
+
  const screenOffset=(browserNumber-1)*innerWidth;
  const localX=x-screenOffset;
- if(localX < -spriteWidth-12 || localX > innerWidth+12){
+ if(localX < -spriteWidth-14 || localX > innerWidth+14){
   traveler.style.display="none";
   return;
  }
+
  traveler.style.display="block";
  traveler.style.opacity=String(opacity);
  traveler.style.top=top+"%";
- // Eight equally-sized poses in the transparent sprite strip.
  traveler.style.backgroundPosition=(frame/7*100)+"% 50%";
  traveler.style.transform=`translate3d(${localX}px,0,0) scaleX(${flip})`;
 }
 function startSantaAnimation(){
  if(!isScreen||browserNumber>2)return;
  if(window.santaAnimationTimer)clearInterval(window.santaAnimationTimer);
- window.santaAnimationTimer=setInterval(animateSanta,33);
+ window.santaAnimationTimer=setInterval(animateSanta,50);
  animateSanta();
 }
 
@@ -859,7 +903,7 @@ function setupController(){
   }
   santaTimerActive=true;
   santaTimerStatus.textContent="Santa is onderweg. De timer start na zijn terugkeer.";
-  // This timeout begins only after the complete 38-second walk/dance/exit.
+  // This timeout begins only after the complete 76-second walk/dance/exit.
   santaRunTimeout=setTimeout(()=>{
    if(!santaTimerActive)return;
    const nextDelay=selectedSantaDelay();
