@@ -42,7 +42,7 @@ textarea{min-height:75px;resize:vertical}
 #screen{position:fixed;inset:0;background:#080817;overflow:hidden}
 #wallpaper{position:absolute;inset:0;background:#080817 center/cover no-repeat;display:none}
 #fireworks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-#traveler{position:absolute;z-index:3;left:0;top:68%;font-size:clamp(34px,6vw,76px);filter:drop-shadow(0 3px 8px #000);display:none;pointer-events:none;will-change:transform}
+#traveler{position:absolute;z-index:4;left:0;top:58%;width:clamp(105px,15vw,220px);height:clamp(155px,23vw,330px);background-image:url("backgrounds/santa-realistic-sprites.png");background-repeat:no-repeat;background-size:800% 100%;background-position:0% 50%;filter:drop-shadow(0 5px 8px #0008);display:none;pointer-events:none;will-change:transform,opacity;transform-origin:50% 100%;}
 .screen-label{position:absolute;top:18px;left:0;right:0;text-align:center;color:#ffffff80;font-size:12px;letter-spacing:3px;pointer-events:none}
 #login{max-width:420px;margin:50px auto}
 #controller{padding-bottom:40px}
@@ -255,7 +255,7 @@ textarea{min-height:75px;resize:vertical}
 
 <div id="screen" class="hidden">
 <div id="wallpaper"></div>
-<div id="traveler">🎅</div>
+<div id="traveler" aria-hidden="true"></div>
 <canvas id="fireworks"></canvas>
 <div class="screen-label" id="screenLabel"></div>
 </div>
@@ -349,23 +349,52 @@ function animateSanta(){
   if(traveler)traveler.style.display="none";
   return;
  }
- const elapsed=(Date.now()-santaStartAt)%24000;
+ const elapsed=(Date.now()-santaStartAt)/1000;
+ const totalWidth=innerWidth*2;
+ const spriteWidth=traveler.getBoundingClientRect().width||Math.min(220,innerWidth*.15);
+ let x=0, frame=0, opacity=1, flip=1, top=58;
+ // One continuous 28-second performance across screens 1 and 2:
+ // walk in, greet, dance by the tree, walk back to a house and disappear.
  if(elapsed<0){traveler.style.display="none";return;}
- const segment=elapsed<12000?1:2;
- if(browserNumber!==segment){
+ if(elapsed<12){
+  const p=elapsed/12;
+  x=-spriteWidth+(totalWidth*.72+spriteWidth)*p;
+  frame=[0,1,2][Math.floor(elapsed*2)%3];
+  if(elapsed>3.2&&elapsed<4.7)frame=2; // friendly greeting
+  top=58+Math.sin(elapsed*5)*.45;
+ }else if(elapsed<20){
+  x=totalWidth*.72;
+  frame=[3,4,5,4][Math.floor((elapsed-12)*1.5)%4];
+  top=57+Math.abs(Math.sin((elapsed-12)*4))*1.4;
+ }else if(elapsed<28){
+  const p=(elapsed-20)/8;
+  x=totalWidth*.72-(totalWidth*.16)*p;
+  frame=[6,7][Math.floor((elapsed-20)*2)%2];
+  flip=-1;
+  top=58+Math.sin(elapsed*4)*.35;
+  if(elapsed>26.5)opacity=Math.max(0,1-(elapsed-26.5)/1.5);
+ }else{
   traveler.style.display="none";
   return;
  }
- const localTime=segment===1?elapsed:elapsed-12000;
- const progress=localTime/12000;
+ const screenOffset=(browserNumber-1)*innerWidth;
+ const localX=x-screenOffset;
+ if(localX < -spriteWidth-10 || localX > innerWidth+10){
+  traveler.style.display="none";
+  return;
+ }
  traveler.style.display="block";
- traveler.style.transform=`translateX(${progress*(innerWidth+100)-70}px)`;
- traveler.style.top=`${68+Math.sin(progress*Math.PI*4)*2}%`;
+ traveler.style.opacity=String(opacity);
+ traveler.style.top=top+"%";
+ traveler.style.backgroundPosition=(frame/7*100)+"% 50%";
+ traveler.style.transform=`translate3d(${localX}px,0,0) scaleX(${flip})`;
 }
 
 function startSantaAnimation(){
  if(!isScreen||browserNumber>2)return;
- setInterval(animateSanta,50);
+ if(window.santaAnimationTimer)clearInterval(window.santaAnimationTimer);
+ window.santaAnimationTimer=setInterval(animateSanta,40);
+ animateSanta();
 }
 
 function resizeAndClear(){
@@ -788,7 +817,7 @@ function setupController(){
  document.getElementById("startSanta").onclick=async()=>{
   try{
    await set(ref(db,"settings/santaStartAt"),Date.now());
-   setStatus("Kerstman gestart op scherm 1 en 2.");
+   setStatus("Santa gestart: wandeling, begroeting, dans en terug naar het huis.");
   }catch(e){setStatus("Kerstmanfout: "+e.message);}
  };
  document.getElementById("stopSanta").onclick=async()=>{
@@ -818,7 +847,7 @@ function initScreen(){
  document.body.innerHTML=`
  <div id="screen">
   <div id="wallpaper"></div>
-  <div id="traveler">🎅</div>
+  <div id="traveler" aria-hidden="true"></div>
   <canvas id="fireworks"></canvas>
   <div class="screen-label" id="screenLabel"></div>
  </div>`;
