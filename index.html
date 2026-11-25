@@ -235,6 +235,17 @@ textarea{min-height:75px;resize:vertical}
 <p class="small">De geselecteerde schermen ontvangen een verversopdracht.</p>
 </section>
 
+<section class="panel" id="pcControlPanel">
+<h2>🖥️ Kerstdorp-pc beheren</h2>
+<p class="small">Bedien alleen de Windows-pc waarop de aparte Promises2U-helper is aangemeld. De helper moet actief zijn.</p>
+<div class="grid">
+<button id="pcKeepAwakeOn" class="primary">☀️ PC WAKKER HOUDEN</button>
+<button id="pcKeepAwakeOff" class="stopbtn">🌙 NORMAAL ENERGIEBEHEER</button>
+</div>
+<div id="pcStatus" class="status">Pc-helper wordt gecontroleerd…</div>
+<p class="small">Een opdracht verloopt na 30 seconden. Dit kan een slapende pc niet zelfstandig wakker maken en ontgrendelt Windows niet.</p>
+</section>
+
 <section class="panel">
 <h2>📺 Live schermvoorbeelden</h2>
 <div class="grid">
@@ -819,6 +830,35 @@ function clearProjectionOnScreen(){
  document.getElementById("screenProjection")?.remove();
 }
 
+async function sendPcCommand(action){
+ if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID){setStatus("Geen beheerdersrechten.");return;}
+ if(!["keep-awake-on","keep-awake-off"].includes(action)){setStatus("Ongeldige pc-opdracht geweigerd.");return;}
+ const now=Date.now();
+ const command={action,id:crypto.randomUUID(),issuedAt:now,expiresAt:now+30000};
+ try{
+  await set(ref(db,"pcControl"),command);
+  const el=document.getElementById("pcStatus");
+  if(el)el.textContent=action==="keep-awake-on"?"Opdracht verzonden: pc wakker houden. Wacht op helperbevestiging.":"Opdracht verzonden: normaal energiebeheer. Wacht op helperbevestiging.";
+ }catch(error){const el=document.getElementById("pcStatus");if(el)el.textContent="Pc-opdracht mislukt: "+error.message;}
+}
+
+function setupPcControl(){
+ const on=document.getElementById("pcKeepAwakeOn");
+ const off=document.getElementById("pcKeepAwakeOff");
+ const el=document.getElementById("pcStatus");
+ if(!on||!off||!el)return;
+ on.onclick=()=>sendPcCommand("keep-awake-on");
+ off.onclick=()=>sendPcCommand("keep-awake-off");
+ onValue(ref(db,"pcStatus"),snapshot=>{
+  const status=snapshot.val();
+  if(!status||!status.updatedAt){el.textContent="Pc-helper nog niet verbonden.";return;}
+  const age=Date.now()-Number(status.updatedAt);
+  if(age<0||age>45000){el.textContent="Pc-helper niet bereikbaar — laatste melding ouder dan 45 seconden.";return;}
+  const labels={awake:"Pc actief — normaal energiebeheer.","keep-awake":"Pc actief — wakker houden ingeschakeld.",sleeping:"Pc slaapt.",error:"Pc-helper meldt een fout."};
+  el.textContent=labels[status.state]||"Pc verbonden — onbekende status.";
+ });
+}
+
 function setupController(){
  document.querySelectorAll("[data-target]").forEach(btn=>{
   btn.addEventListener("click",()=>{
@@ -1008,6 +1048,7 @@ async function init(){
     controller.classList.remove("hidden");
     setupController();
     setupPreviews();
+    setupPcControl();
     onValue(ref(db,"settings/snowIntensity"),snapshot=>{
      const value=Number(snapshot.val());
      if(Number.isFinite(value)){
